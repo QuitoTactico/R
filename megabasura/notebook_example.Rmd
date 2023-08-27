@@ -1,0 +1,33 @@
+---
+title: "Basura"
+output: html_notebook
+---
+
+**Di María**
+
+# EKISDÉ
+
+**ID_Cliente**: Es una variable numérica discreta
+
+```{r}
+#Ekisdé x2, ctrl+alt+i
+
+print(asesoresFA)
+```
+
+
+```{r}
+barplot(asesoresFA)
+```
+
+
+```{r}
+print(asesoresFR)
+```
+
+
+```{r}
+barplot(sort(asesoresFR))
+```
+
+

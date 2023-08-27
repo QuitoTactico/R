@@ -1,0 +1,90 @@
+---
+title: "Lab 9-13 bloque 1"
+output: html_notebook
+---
+
+
+```{r}
+library(readxl)
+icb = read_excel('info_clientes_banco.xlsx')
+```
+
+#### **Problema 9.** Obtenga un listado que contenga los saldos de cada una de las cuentas corrientes abiertas en el banco.
+```{r} 
+lista_saldos_cc = icb[icb$Cuenta_corriente==1,]$Saldo_cuenta_corriente
+```
+Son demasiados para imprimirlos todos, así que imprimiremos sólo los primeros 30 para ver si los datos son correctos.
+```{r}
+print(lista_saldos_cc[0:30])
+```
+#### **Problema 10.** ¿Cuál es el saldo total que tiene el banco en cuentas corrientes?
+
+```{r}
+saldo_cc = sum(lista_saldos_cc)
+print('Total de saldo en cuentas corrientes:');saldo_cc
+```
+
+#### **Problema 11.** ¿El banco tiene más dinero en cuentas corrientes o de ahorros? ¿Cuál es la distribución porcentual de estas cantidades?
+
+```{r}
+lista_saldos_ca = icb[icb$Cuenta_ahorros==1,]$Saldo_cuenta_ahorros
+saldo_ca = sum(lista_saldos_ca)
+
+saldo_total = saldo_cc+saldo_ca
+print('Saldo total:'); saldo_total
+```
+```{r}
+porcentaje_cc = (saldo_cc/saldo_total) * 100
+porcentaje_ca = (saldo_ca/saldo_total) * 100
+
+print('% de saldo CC:');porcentaje_cc
+print('% de saldo CA:');porcentaje_ca
+```
+```{r}
+barplot(c(porcentaje_cc,porcentaje_ca), main= 'Saldo CC VS CA (%)', xlab = 'Cuentas Corrientes             Cuentas Ahorros', ylab = '%' )
+```
+A la izquierda vemos el porcentaje de saldo que contienen las cuentas corrientes, es mucho menor que el que contienen las cuentas de ahorros.
+
+#### **Problema 12.** Obtenga e interprete tablas de frecuencias absolutas y relativas para el segmento de clientes y tipos de clientes.
+
+```{r}
+print('Segmentos (Frecuencia absoluta):')
+(tabla_segmentos_FA = table(icb$Segmento))
+```
+Vemos que el mayor número de clientes tienen una cuenta básica, con 596 de ellos.
+```{r}
+print('Segmentos (Frecuencia relativa):')
+(tabla_segmentos_FR = (tabla_segmentos_FA/length(icb$Segmento)) * 100)
+```
+Su frecuencia relativa nos lo confirma. Con un porcentaje de 29%, es mucho mayor al de los demás segmentos o tipos de cuenta.
+
+```{r}
+print('Tipo de cliente (Frecuencia Absoluta):')
+(tabla_tipo_FA = table(icb$Tipo_Cliente))
+```
+Vemos que la mayoría de clientes son de tipo rehén, con 772 de ellos.
+```{r}
+print('Tipo de cliente (Frecuencia Relativa):')
+(tabla_tipo_FR = (tabla_tipo_FA/length(icb$Tipo_Cliente)) * 100)
+```
+La frecuencia relativa nos lo confirma, los clientes rehén tienen el mayor porcentaje entre los tipos de cliente.
+
+#### **Problema 13.** Obtenga e interprete diagramas de barras para la información anterior.
+
+```{r}
+barplot(tabla_segmentos_FA, main = 'Segmentos (FA)', xlab = 'Segmento', ylab = '# de clientes')
+```
+```{r}
+barplot(tabla_segmentos_FR, main = 'Segmentos (FR)', xlab = 'Segmento', ylab = '% de clientes')
+```
+Los clientes con cuenta básica son los más comunes, teniendo la mayor frecuencia absoluta (y por lo tanto, relativa).
+
+Los menos comunes son los de segmento alto y medio, ambos con apenas el 10% de los clientes.
+
+```{r}
+barplot(tabla_tipo_FA, main = 'Tipo (FA)', xlab = 'Tipo de cliente', ylab = '# de clientes')
+```
+```{r}
+barplot(tabla_tipo_FR, main = 'Tipo (FR)', xlab = 'Tipo de cliente', ylab = '% de clientes')
+```
+Los clientes de tipo rehén son los más abundantes, tienen una frecuencia absoluta (y también relativa) mucho mayor a la de los demás tipos, mientras que los apóstoles, decididos y negociadores tienen sólo un 10% cada uno.
