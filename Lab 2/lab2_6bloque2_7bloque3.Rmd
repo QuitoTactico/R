@@ -1,0 +1,148 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+### Ejercicio 6. Usando las funciones programadas en el Bloque 1 simule el experimento de lanzar 5 dados y registrar la media de estos lanzamientos.
+
+a)  Simule el experimento 5000 veces y guarde las medias de lanzar 5000 veces 5 dados en una variable llamada "medias".
+
+```{r}
+set.seed(1234)
+suma_cinco_dados = function(n){
+    d1 = sample(1:6, size=n, replace=T)
+    d2 = sample(1:6, size=n, replace=T)
+    d3 = sample(1:6, size=n, replace=T)
+    d4 = sample(1:6, size=n, replace=T)
+    d5 = sample(1:6, size=n, replace=T)
+    return(d1+d2+d3+d4+d5)
+}
+
+# Metemos los resultados en este vector
+medias = suma_cinco_dados(n=5000)/5
+```
+
+b)  Grafique el histograma de las medias.
+
+```{r}
+hist(medias, freq = F, main = 'Histograma de promedios al lanzar 5 dados')
+```
+
+c)  Calcule la media y la varianza del vector medias, grafique la media como una línea vertical sobre el histograma, y adicione dos líneas verticales a ± una desviación estándar de la media
+
+```{r}
+# Calculamos la media y la desviación estandar
+media = mean(medias)
+s = sd(medias)
+
+cat('Media: ', media, '\n')
+cat('Desvación estandar: ', s, '\n')
+```
+
+Hicimos una función para graficar este histograma con cualquier número de intervalos.
+
+```{r}
+histograma = function(presicion = 10){
+    
+    # Creamos un histograma con las medias, con la presicion
+    #   deseada
+    hist(medias, freq = F, breaks = presicion, main = 'Histograma de promedios al lanzar 5 dados')
+    
+    # Línea de distribución normal
+    x = seq(0,7,0.01)
+    lines(x, dnorm(x, mean = media, sd=s), col='green')
+    
+    #líneas verticales y leyenda
+    abline(v = media, col = 'blue', lwd = 2)
+    abline(v = media + s, col = 'red', lwd = 1.5)
+    abline(v = media - s, col = 'red', lwd = 1.5)
+    legend('topright',
+           legend = c(
+               'media = 3.5',
+               'media ± sd',
+               'distr normal'
+           ),
+           lwd = 2,
+           col=c(
+               'blue',
+               'red',
+               'green'
+           )
+    )
+    legend('bottomright',
+           legend = 'sd = 0.76',
+    )
+    
+}
+```
+
+Histograma común:
+
+```{r}
+histograma()
+```
+
+Histograma con el doble de intervalos:
+
+```{r}
+histograma(20)
+```
+
+Vemos que los promedios de los lanzamientos siguen la función de la distribución normal. Mientras más dados se tiren y se grafique el histograma con más intervalos, más se asemejará a la distribución normal.
+
+
+# Bloque 3
+### Ejercicio 7. En un concurso de lanzamiento de dardos, los participantes tienen que lanzar un dardo hacia un tablero circular. La posición donde aterrice el dardo en el tablero se puede representar como un número entre 0 y 1, donde 0 representa el centro del tablero y 1 representa el borde exterior. Se sabe que la posición del aterrizaje sigue una distribución uniforme
+
+a) Generar 1000 lanzamientos simulados de dardos y almacenar las posiciones de aterrizaje en un vector.
+```{r}
+# Generar 1000 lanzamientos de dardos
+set.seed(1234)  
+lanzamientos = runif(1000, min = 0, max = 1) 
+```
+
+b) Calcular la frecuencia relativa de dardos que aterrizan en la zona central del tablero, definida como el intervalo [0.2, 0.4].
+```{r}
+# Frecuencia relativa de [0.2, 0.4]
+frecuencia_central = sum(lanzamientos >= 0.2 & lanzamientos <= 0.4) / 1000
+
+# Resultados
+cat("Frecuencia relativa en [0.2, 0.4]:", frecuencia_central, "\n")
+```
+
+c) Calcular la frecuencia relativa de dardos que aterrizan en el borde exterior del tablero, definido como el intervalo [0.8, 1].
+```{r}
+# Frecuencia relativa de [0.8, 1.0]
+frecuencia_borde = sum(lanzamientos >= 0.8 & lanzamientos <= 1) / 1000
+
+
+cat("Frecuencia relativa en [0.8, 1.0]:", frecuencia_borde, "\n")
+```
+Las frecuencias relativas de los dos intervalos tienen sentido, porque tanto [0.2-0.4] como [0.8, 1] son el 20% de [0, 1]. Así que al ser una distribución contínua, cada uno contendrá un 20% de los lanzamentos.
+
+Vemos que efectivamente siguen una distribución contínua, todos los intervalos se van a ir acercando a 1 mientras más lanzamientos se hagan.
+
+```{r}
+
+hist(lanzamientos, freq = F, main = 'Histograma de lanzamiento de dardos', breaks = 20)
+abline(v = 0.2, col='blue', lwd = 2)
+abline(v = 0.4, col='blue', lwd = 2)
+abline(v = 0.8, col='red', lwd = 2)
+abline(v = 1, col='red', lwd = 2)
+abline(h = 1, col='green', lwd = 2)
+
+legend('bottomright',
+       legend = c(
+           '[0.2, 0.4]',
+           '[0.8, 1.0]',
+           '1'
+       ),
+       lwd = 2,
+       col=c(
+           'blue',
+           'red',
+           'green'
+       )
+)
+
+```
