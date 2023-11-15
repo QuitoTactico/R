@@ -1,0 +1,334 @@
+---
+title: "Laboratorio 4 - Estadística general"
+output: html_notebook
+---
+
+**Integrantes:**
+
+-   Víctor Manuel Botero Gómez.
+
+-   Camilo Palacio Restrepo.
+
+-   Esteban Trujillo Carmona.
+
+-   Esteban Vergara Giraldo.
+
+## **BLOQUE 1**
+
+### **Ejercicio 1**
+
+**1.** Cargue la data ventaypub.csv en una variable ventaypub.
+
+```{r}
+library(readr)
+ventaypub = read.csv("F:/Desktop/UNIVERSIDAD/SEMESTRE_6/Estadística_General/Taller_4/ventaypub.csv")
+View(ventaypub)
+```
+
+
+**2.** Realice un diagrama de dispersión de costos de Publicidad versus Ventas. ¿Qué se puede deducir a partir del grafico? ¿Qué comportamiento observa en los datos?
+
+```{r}
+x = ventaypub$Publicidad
+y = ventaypub$Ventas
+plot(x,y, main="Diagrama de Dispersión", 
+     xlab="Gasto Publicidad", 
+     ylab="Ingreso Ventas")
+```
+Se genera un diagrama de dispersión (scatter plot) de dos variables: "Gasto Publicidad" en el eje X y "Ingreso Ventas" en el eje Y. 
+
+**Distribución de datos:** El gráfico muestra cómo se distribuyen los datos en relación con los costos de publicidad y las ventas.
+
+**Correlación:** A partir del gráfico, es posible indicar que se visualiza una correlación muy baja y poco perceptible aparentemente. 
+
+**Comportamiento lineal:** Los datos están difusos y no siguen un patrón lineal claro. Debido a ello, tal vez lo más adecuado no sería aplicar un modelo lineal. Podría ser necesario utilizar otros métodos de análisis para comprender mejor una relación mas clara entre estas variables.
+
+
+**3.** Utilice la regresion lineal para estimar los parámetros β0, β1 de la ecuación Y = β1 ̂ X + β0 con la que se pueda predecir el ingreso las ventas según los gastos en publicidad, usando el método de mínimos cuadrados. Evaluar la correlación entre ambas variables. ¿Cuál es la venta variable o venta adicional por gastos en publicidad?.
+
+```{r}
+xb= mean(x)
+yb = mean(y)
+(beta1 = sum((x-xb)*(y-yb))/sum((x-xb)^2))
+(beta0 = yb - beta1*xb)
+```
+**Correlación entre ambas variables:**
+El coeficiente beta1, que es igual a 0.2017527, representa la pendiente de la regresión lineal. Esta pendiente indica la relación lineal entre el gasto en publicidad y las ventas. Un valor positivo de beta1 (como en este caso) indica una correlación positiva, lo que significa que a medida que aumentan los gastos en publicidad, se espera que aumenten las ventas. Sin embargo, la magnitud de la correlación depende de beta1.
+
+**Venta variable o venta adicional por gastos en publicidad:**
+El coeficiente beta1 (0.2017527)  indica cuánto se espera que aumenten las ventas por cada unidad adicional de gasto en publicidad. En este caso, se espera que las ventas aumenten en aproximadamente 0.2017527 millones de pesos por cada millón de pesos adicional de gasto en publicidad.
+
+```{r}
+cor(x,y)
+```
+Esta es una relación directamente proporcional, por ser un valor positivo. Sin embargo, podría decirse que es un tanto difusa ya que este valor se encuentra más cerca del 0 que del 1.
+
+
+**4.** Realice el mismo proceso anterior usando la funcion lm de R.
+
+```{r}
+lmod = lm(Ventas~Publicidad, data = ventaypub)
+summary((lmod))
+coef(lmod)
+cat("Estimaciones por MCO: ", beta0, beta1)
+```
+Estimación con MCO nos da el intercepto de la línea y la pendiente son equivalentes ambos métodos.
+
+Este código realiza el mismo proceso que el ejercicio anterior, pero en este caso, utiliza la función lm de R para ajustar un modelo de regresión lineal en lugar de calcular manualmente los coeficientes. 
+
+
+**5.** Explicite la fórmula del modelo y compare los resultados obtenidos por el método de mínimos cuadrados y la función lm de R.
+
+En primer lugar, dados los resultados obtenidos en el método de regresión linear y en el de mínimos cuadrados, la fórmula del modelo correspondería a:
+
+ **y = 6.066111 + 0.2017527x** 
+
+En segundo lugar, como se puede evidenciar en lo arrojado por R, los resultados obtenidos a través del modelo de regresión lineal (lm) son, en efecto, equivalentes a los resultados calculados manualmente en el ejercicio anterior usando el método de los mínimos cuadrados.Así, pues, se puede concluir que sin importar el método que se utilice para calcular los valores de beta0 y beta1, se va a llegar al mismo resultado.
+
+**6.** Determine el valor de la estimación de σ^2, es decir s^2 e interprete este resultado.
+
+Ahora bien, el valor de la estimación de s^2 se obtendrá a partir de los dartos que brinda el summary.
+
+```{r}
+summary((lmod))
+```
+
+De ahí, obtenemos que la desviación estándar de los residuos es de aproximadamente 2.723, por lo que para calcular la varianza es necesario elevar dicho valor al cuadrado, de la siguiente manera:
+
+```{r}
+( varianza = (2.723)^2 )
+```
+
+Así, la varianza corresponde a 7.414729. Dado este resultado se puede concluir que, por un lado, debido a la lejanía considerable de este valor respecto al 0 (es decir, la diferencia entre los valores observados y los predichos) que el modelo no está del todo bien ajustado. Podría considerarse objeto de mejora, dado el valor obtenido. Este está indicando que la diferencia entre los valores obtenidos y los predichos por el modelo es considerable.
+
+**7.** ¿Qué se puede inferir en cuanto a la proporción de la variación total de las ventas que puede ser explicada mediante una relación lineal con los gastos de publicidad? Calcule el coeficiente de determinación y el coeficiente de determinación ajustado para apoyar la respuesta.
+
+Para responder a esta pregunta es necesario, así como nos lo recomiendan en el enunciado mismo, calcular el coeficiente de determinación y el coeficiente de determinación ajustado.
+
+Primero, se procede a obtener el valor correspondiente al **coeficiente de determinación.** Para ello, se utiliza el dato brindado por el summary de lmod. 
+
+Este corresponde a **Multiple R-squared, que tiene un valor de aproximadamente 0.1213**.
+
+Segundo, se pasa a obtener el valor correspondiente al **coeficiente de determinación ajustado.** Para ello, se utiliza el dato brindado por el summary de lmod.
+
+Este corresponde a **Adjusted R-squared, que tiene un valor de aproximadamente  0.09877.**
+
+A partir de estos datos obtenidos, es posible indicar qué porcentaje de variabilidad presenta el modelo. Así, basados en la teoría, cuanto más cercanos estén los valores a 1 mejor se presenta el modelo.
+
+Basándonos entonces en esa premisa, podemos evidenciar que en este caso ambos valores se encuentran muy alejados de 1 (el más cercano está a casi 0.9 de diferencia). Así, pues, es posible concluir que el modelo es regular, y que, por lo tanto, tiene espacio para mejora.
+
+**8.** ¿El ajuste del modelo lineal es sólido? Apoye la respuesta con la medida del coeficiente de correlación.
+
+Para dar respuesta a este punto, es necesario utilizar la función de correlación entre variables (***cor()***) que R brinda. Se usan las variables x y y, correspondiendo respectivamente a la publicidad y a las ventas.
+
+Previamente se habían obtenido tales variables, las cuales serán usadas acá.
+
+ 
+```{r}
+cor(x,y)
+```
+Así, se obtiene que el coeficiente de correlación es aproximadamente 0.3482764.
+
+Este valor nos indica cuán sólido es el modelo lineal.
+
+Sin embargo, y respondiendo a la pregunta inicial, debido al valor obtenido que se encuentra alejado del 1 (donde el modelo sería completamente sólido) y más cercano a 0 (donde el modelo es para nada sólido), es posible concluir que el modelo lineal usado no es completamente sólido, en realidad, tiende a ser más deficiente que sólido.
+
+**9.** ¿Cuál es el ingreso por ventas si se tiene un costo de publicidad de 22 millones de pesos?
+
+Para calcular el valor correspondiente, basándonos en el modelo lineal, se  utilizarán los valores obtenidos de beta0 y beta1.
+
+Así, pues, utilizando también la función del modelo (la cual previamente se había construido), se tiene que que reemplazando x por 22 obtendríamos lo siguiente.
+
+```{r}
+( y = beta0 + beta1*22)
+```
+Por lo tanto, basándonos en la respuesta obtenida, si se tiene un costo de 22 millones de pesos en publicidad, el ingreso por ventas sería de aproximadamente 10.50467 millones de pesos, lo que claramente nos demuestra una falencia grave en el modelo de negocio planteado por la empresa.
+
+
+## **BLOQUE 2**
+
+**1.** ¿Es el modelo lineal el más adecuado para hacer un análisis de regresión en este caso? Realice una estimación puntual de la desviación estándar.
+
+Para dar respuesta a este punto, se usará uno de los valores brindados por el summary de lmod. En este caso, el valora usar corresponde a Residual Standard Error.
+
+```{r}
+lmod<-lm(Ventas~Publicidad,data = ventaypub)
+summary(lmod)
+sigma_h = 2.723
+```
+
+A partir de dicho valor, es posible concluir que el modelo lineal, en este caso, no es el más adecuado para un análisis de regresión lineal. 
+Esto se debe a la magnitud del valor obtenido con respecto a los valores del dataset, lo cual indica que los residuos son medianamente grandes en promedio y que el modelo no se ajusta bien a los datos, por lo que no es el más adecuado para la regresión lineal.
+
+**2.** Realice un breve estudio de los residuos que permita validar los supuestos de la regresión. Analizar linealidad y homocedasticidad. Incluya gráfico de normalidad de los residuos estandarizados, contraste de hipótesis sobre normalidad e intervalo de confianza del 95%.
+
+Para realizar tal estudio es necesario llevar a cabo varios pasos y cálculos.
+
+En primer lugar, es necesario utilizar el Q-Q plot, que R brinda a partir de los datos, para analizar la linealidad.
+
+A continuación se presenta la gráfica.
+```{r}
+## Q-Q plot para los residuales del modelo.
+plot(lmod, which = 2, col = c("blue"))
+```
+
+De ella es posible concluir que presenta, en cierta medida, una linealidad más o menos clara. Vemos que los valores se encuentran más o menos igualmente distribuidos a lo largo de la línea de ajuste de la gráfica. En algunos casos hay ciertos valores que no cumplen con esto, y se encuentran más alejados de la misma. Debido a todo lo anterior, es posible indicar que sí se presenta una linealidad, la cual podría ser mejor claramente, pero que para efectos de la práctica puede ser de utilidad sin problema.
+
+En segundo lugar, es necesario calcular y graficar los residuales del modelo con el fin de analizar su homocedasticidad. 
+
+A continuación se calculan los residuales.
+
+```{r}
+## Residuales del modelo
+ventaypub$resid <- lmod$residuals
+ventaypub$obs <- 1:length(ventaypub$resid)
+summary(ventaypub$resid)
+```
+
+Y posteriormente se grafican dichos residuales.
+
+
+```{r}
+## Graficar  residuales
+
+plot(ventaypub$obs, ventaypub$resid, main="Gráfico de Residuales", xlab="Observaciones", ylab="Residuos")
+abline(h=0, col="green")
+```
+
+A partir de la gráfica anterior, es posible concluir que los valores de los residuales se encuentran dispersos a lo largo del valor 0 de manera más o menos constante. Vemos que hay algunos valores que se encuentran más dispersos y alejados del 0, los cuales afectan en cierta medida la calidad y la homocedasticidad del modelo. Sin embargo, con relación a la mayoría de los datos es posible decir lo contrario debido a su dispersión casi constante. Así, se puede decir que en cierta medida el modelo posee una homocedasticidad adecuada.
+
+Finalmente, se procede a realizar contraste de hipótesis sobre normalidad e intervalo de confianza del 95%, usando t-test, el cual lo brinda R.
+
+```{r}
+## IC para la media de los residuales
+t.test(ventaypub$resid, conf.level = 0.95)
+```
+A continuación se procede a explicar cada parte del test-t.
+
+Primeramente, este test se utiliza para evaluar si la media de una muestra es significativamente diferente de un valor específico (en este caso, cero).
+La hipótesis nula (H0) es que la media de los residuos es igual a cero, y la hipótesis alternativa (Ha) es que la media de los residuos no es igual a cero.
+
+Posteriormente, se procede a **calcular el valor t**, el cual dio como resultado -3.695e-16, que es extremadamente cercano a cero.
+
+Además, se **calcula el valor p (p-value)**, el cual resulta ser 1, lo que indica que no hay evidencia significativa para rechazar la hipótesis nula.
+
+Adicionalmente, basándose en una **confianza del 95% se calcula un intervalo de confianza para la media de los residuos**. El intervalo que resulta del procedimiento es [−0.8485908, 0.8485908]. Es posible decir que, dado que este intervalo incluye el cero, proporciona más evidencia de que la media de los residuos no es significativamente diferente de cero.
+
+Por último, se procede a **calcular la estimación puntual de la media de los residuos**, la cual da como resultado −1.551414e-16, que es prácticamente cero.
+
+Así, a partir de todo lo calculado anteriormente dentro del t-test, es posible decir que la hipótesis nula no se rechaza, ya que la evidencia no demuestra que la media de los residuos sea significativamente diferente de 0.
+
+**3.** Determine si el modelo es estadísticamente significativo. Utilizando las pruebas de significancia F y t.
+
+En este caso, se utilizarán tanto una prueba a partir de un intervalo de confianza del 95%, como las pruebas F y t realizadas a partir del summary de lmod.
+
+En primer lugar, se realiza la prueba con el intervalo de confianza del 95%.
+```{r}
+# Con intervalo de confianza
+confint(lmod, level = 0.95)
+```
+A partir de estos resultados, con un parámetro del 95% se puede concluir que son significativos ya que no incluyen al cero en los interceptos.
+
+Ahora, se procede a realizar las pruebas F y t usando el summary de lmod.
+
+```{r}
+summary(lmod)
+```
+De ahí es posible evidenciar que el valor p (p-value) obtenido tanto en la prueba F como en la t son iguales, lo que indica de primera mano que los resultados que se obtengan en dichas pruebas serán válidos.
+
+En la prueba F se toma la hipótesis nula (H0) como **todos los coeficientes de regresión son iguales a cero (es decir, que ninguna variable es significativa)**.
+
+En la prueba t, siendo una prueba individual, se toma la hipótesis nula (H0) como **que el coeficiente de la variable publicidad es igual a cero**.
+
+En ambos casos, se tiene como hipótesis alternativa (Ha) que **el coeficiente o los coeficientes (dependiendo de si es F o t) son diferentes de cero**.
+
+Como resultado de las pruebas se **obtiene el p-value igual a 0.02565**, el cual es menos que 0.05. Por lo tanto, en ambas pruebas se rechaza la hipótesis nula.
+
+Así, se tiene como conclusión de la prueba F que **al menos una variable en el modelo es significativa** en la predicción de la variable dependiente.
+
+Y, con relación a la prueba t se tiene como conclusión que **la variable "publicidad" es significativa en el modelo.**
+
+Finalmente, tomando lo obtenido en ambas pruebas es posible concluir que el modelo sí es estdísticamente significativo para el parámetro del 95% de confianza.
+
+
+**4.** Calcular la matriz de varianzas y covarianzas.
+
+Para calcular matriz de varianzas y covarianzas se requiere del valor de la desviación estándar obtenida previamente en el summary de lmod.
+A continuación se procede a utilizarla con tales fines.
+
+```{r}
+MSE = sigma_h**2 #sigma_h fue tomada del summary(lmod)
+
+x = cbind(rep(1,nrow(ventaypub)), ventaypub$Publicidad)
+( varb = MSE*solve(t(x)%*%x))
+```
+Así, pues, se tiene la matriz de varianzas y covarianzas, de la cual es posible indicar que las diagonales son varianzas, la 1,1 es de beta0 y la 2,2 es de beta1.
+Y la diagonal secundaria (o contradiagonal) son las covarianzas. 
+A partir de esos valores obtenidos en la covarianza, es posible concluir que existe una relación de proporcionalidad inversa, ya que las covarianzas son negativas.
+
+**5.** Calcular el error estándar de cada coeficiente.
+
+A continuación, se procede a calcular el error estándar tanto de beta0 como de beta1.
+
+```{r}
+( se_b0 = sqrt(diag(varb)[1]) )
+( se_b1 = sqrt(diag(varb)[2]) )
+```
+Así, se tiene que el error estándar de beta 0 es 1.023639, y el error estándar de beta1 es 0.0869614.
+Estos valores indican que la estimación de los coeficientes beta0 y beta1 fue más o menos precisa, ya que son valores un tanto pequeños. Sin embargo, se desearía tener in errores menores con el fin de asegurar una mayor precisión en el cálculo de resultados al utilizarlos.
+
+**6.** Determinar si β0 y β1 son estadísticamente significativos en el modelo. Interpretar los resultados.
+
+Para resolver este punto se utilizará, en este caso, la prueba a partir de un intervalo de confianza del 95%.
+
+Así, se realiza la prueba con el intervalo de confianza del 95%.
+```{r}
+confint(lmod, level = 0.95)
+```
+A partir de estos resultados, con un parámetro del 95% se puede concluir que tanto beta0 como beta1 son significativos, ya que no incluyen al cero en los interceptos.
+
+**7.** Calcule intervalos de confianza del 95 % y 99 % para los parámetros β0 y β1. Interpretar.
+
+A continuación se realiza el cálculo de los intervalos de confianza del 95% y 99%, según lo pedido.
+
+Primero, se procede a calcular el intervalo del 95%.
+```{r}
+confint(lmod, level = 0.95)
+```
+A partir de los valores resultantes, es posible concluir que para el parámetro de 95% (alpha = 0.05) tanto beta0 como beta1 son significativos debido a que no contienen al cero dentro del intervalo. Por lo tanto, para este porcentaje de confianza el modelo sí es significativo.
+
+Ahora, se calcula el intervalo del 99%.
+
+```{r}
+confint(lmod, level = 0.99)
+```
+
+A partir de los nuevos valores resultantes, es posible concluir que para el parámetro de 99% (alpha = 0.01) beta1 ya deja de ser significativo, puesto que contiene al cero dentro del intervalo. Por lo tanto, para este porcentaje de confianza el modelo ya no es significativo.
+
+
+**8.** Determine un intervalo de confianza del 95 % para las ventas promedio cuando los gastos en publicidad son de 7.5 millones de pesos. Interpretar.
+
+```{r}
+x = ventaypub$Publicidad
+y = ventaypub$Ventas
+cov_nueva = data.frame(x=7.5) ## Nuevo valor de la covariable
+predict( lm(y~x), newdata = cov_nueva, interval = "confidence", level =0.95 )
+```
+En este caso, los resultados están indicando un intervalo en el cual se podría encontrar la respuesta, es decir la predicción de las ventas cuando x = 7.5 (7.5 millones de pesos en gastos de publicidad), con una confianza del 95%. 
+Así, pues, el intervalo de confianza resultante sería [6.550685, 8.607828]. 
+
+
+**9.** Determine un intervalo de confianza del 95 % para las ventas cuando los gastos en publicidad son de 11 millones de pesos. Interpretar.
+
+```{r}
+x = ventaypub$Publicidad
+y = ventaypub$Ventas
+cov_nueva = data.frame(x=11) ## Nuevo valor de la covariable
+predict( lm(y~x), newdata = cov_nueva, interval = "confidence", level =0.95 )
+```
+En este caso, los resultados están indicando un intervalo en el cual se podría encontrar la respuesta, es decir la predicción de las ventas cuando x = 11 (11 millones de pesos en gastos de publicidad), con una confianza del 95%. 
+Así, pues, el intervalo de confianza resultante sería [7.423764, 9.147018].
+
+
+
+

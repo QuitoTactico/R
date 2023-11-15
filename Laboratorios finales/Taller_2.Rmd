@@ -1,0 +1,633 @@
+---
+title: "Laboratorio 2 - Estadística general"
+output: html_notebook
+---
+
+***Integrantes:***
+
+-   Víctor Manuel Botero Gómez.
+
+-   Camilo Palacio Restrepo.
+
+-   Esteban Trujillo Carmona.
+
+-   Esteban Vergara Giraldo.
+
+## **BLOQUE 1**
+
+### ***Ejercicio 1***
+
+En el experimento aleatorio de lanzar una moneda equiprobable, se define el espacio
+muestral como el conjunto {"𝐶𝑎𝑟𝑎", "𝑆𝑒𝑙𝑙𝑜"}
+
+**a)** Construya una función usando una estructura condicional en R, de tal forma que acepte un parámetro 𝑝 y devuelva el lanzamiento de una moneda con probabilidad 𝑝 de obtener un “𝑆𝑒𝑙𝑙𝑜”.
+
+```{r}
+Lanzamiento_Moneda = function( p, n ){
+  # p es la probabilidad del sello (0 <= p <= 1)
+  # n es el número de lanzamiento
+  set.seed(4567)
+  sample( c("Cara", "Sello"), size = n, replace = T, prob = c(1-p, p))
+}
+
+Lanzamiento_Moneda(n=10, p=0.5)
+```
+La descripción de la implementación y su detalle es la siguiente:
+
+- Lanzamiento_Moneda = Esta función toma dos parámetros como entrada: p (la probabilidad de obtener "Sello") y n (el número de lanzamientos que deseas realizar).
+
+- set.seed(4567): Esto establece una semilla para la generación de números aleatorios. Con dicha semilla nos aseguramos de que los resultados sean reproducibles si se utiliza la misma semilla. La elección de la semilla puede ser cualquiera, pero aquí se usó "4567" como ejemplo.
+
+- sample(c("Cara", "Sello"), size = n, replace = TRUE, prob = c(1-p, p)): Esta es la parte principal de la función que simula el lanzamiento de la moneda.
+
+- c("Cara", "Sello"): Define los posibles resultados del lanzamiento de la moneda: "Cara" y "Sello".
+
+- size = n: Indica el número de lanzamientos que deseas realizar, que es el valor que se da como parámetro n.
+
+- replace = TRUE: Esto significa que se permite el reemplazo, lo que permite que el mismo resultado ("Cara" o "Sello") pueda aparecer en múltiples lanzamientos.
+
+- prob = c(1-p, p): Define las probabilidades asociadas a obtener "Cara" o "Sello". La probabilidad de obtener "Cara" es (1 - p) y la probabilidad de obtener "Sello" es p, es la aplicación de un complemento del parámetro p.
+
+Finalmente, la función devuelve una secuencia de lanzamientos de la moneda como un vector. El número de elementos en este vector será igual a n, que es el número de lanzamientos especificado.
+
+
+**b)** Simule el lanzamiento de 1234 monedas no cargadas, calcule la tabla de frecuencia relativa y compárela
+con las probabilidades teóricas.
+
+```{r}
+(table_coins = table( Lanzamiento_Moneda(n=1234, p=0.5)))
+round((table_coins/1234) * 100, 2)
+```
+El código anterior simula el lanzamiento de 1234 monedas no cargadas (equiprobables) con una probabilidad de obtener "Sello" igual a 0.5 en cada lanzamiento. Luego, se calcula la tabla de frecuencia relativa de los resultados y se comparan estas frecuencias relativas con las probabilidades teóricas.
+
+El resultado final es una tabla de frecuencia relativa que muestra la frecuencia de "Cara" y "Sello" como porcentajes, lo que nos permite comparar estos resultados con las probabilidades teóricas. Asumiendo que la moneda es justa y no está cargada, esperaríamos que las frecuencias relativas se acerquen a las probabilidades teóricas del 50% para "Cara" y 50% para "Sello". Segun nuestra implementación se evidencia una leve desviación frente a las probabilidades teóricas siendo la frecuencia de cara = 49.92 y la de sello 50.08 evidenciando un desfase de 0.08 favoreciendo una probabilidad mayor a sello.
+
+
+**c)** Simule el lanzamiento de 1234 monedas cargadas usando la función del inciso a) de tal forma que la
+probabilidad de que una moneda obtenga “𝐶𝑎𝑟𝑎” sea de 0.73.
+
+```{r}
+(table_coins = table( Lanzamiento_Moneda(n=1234, p=0.27)))
+round((table_coins/1234) * 100, 2)
+```
+
+El código qanterior simula el lanzamiento de 1234 monedas cargadas utilizando la función Lanzamiento_Moneda que se definió previamente. En este caso, la probabilidad de obtener "Cara" se establece en 0.27 (en lugar del valor anterior de 0.5), lo que hace que estas monedas estén "cargadas" hacia el resultado "Sello".
+
+Explicación paso a paso del código:
+
+1. (table_coins = table(Lanzamiento_Moneda(n=1234, p=0.27))): Aquí se simula el lanzamiento de 1234 monedas cargadas usando la función Lanzamiento_Moneda. Los resultados de los lanzamientos se almacenan en la variable table_coins. En este caso, la probabilidad de obtener "Cara" se establece en 0.27, lo que significa que la probabilidad de obtener "Sello" es 0.73. La función table se utiliza para contar la frecuencia de cada resultado ("Cara" o "Sello") en los lanzamientos.
+
+2. round((table_coins/1234) * 100, 2): Esta línea de código calcula las frecuencias relativas y las convierte a porcentajes redondeados a dos decimales.
+
+   - table_coins/1234: Divide la tabla de frecuencias table_coins por el número total de lanzamientos (1234), lo que da como resultado la frecuencia relativa de cada resultado como un decimal que al multiplicarse se convierte en porcentaje.
+   
+
+El resultado final es una tabla de frecuencia relativa que muestra la frecuencia de "Cara" y "Sello" como porcentajes, pero en este caso, dado que la moneda está cargada con una probabilidad de 0.27 para "Cara" y 0.73 para "Sello", esperamos que las frecuencias relativas reflejen estas probabilidades y se acerquen al 27% para "Cara" y al 73% para "Sello" como en la práctica se comprueba.
+
+  
+### ***Ejercicio 2*** 
+
+En el experimento aleatorio de lanzar un dado de 6 caras que no está cargado.
+
+**a)** Define el espacio muestral y calcula la probabilidad de obtener un número, la probabilidad de obtener un par y la probabilidad de obtener un 1 o un 6.
+
+
+El espacio muestral del dado está dado por el siguiente evento S:
+
+\[
+s = {(1,2,3,4,5,6)} 
+\]
+
+La probabilidad de obtener un numero es 16.6% y equivale a la probabilidad de que el dado caiga por alguna de sus caras, esa es:
+
+\[
+P(i)=1/6
+\]
+
+
+Para encontrar la probabilidad de los numeros pares se debe realizar la suma de las caras que cumplen con dicha condición en el espacio muestral, estas son la cara 2, 4 y 6. Sumamos las probabilidades de estas caras y obtenemos la probabilidad de que el dado caiga en un numero par.
+
+\[
+P(2∪4∪6) = P(2) + P(4) + P(6) = 1/6 + 1/6 + 1/6 = 1/2
+\]
+
+El dado puede caer par 1 de cada 2 posibilidades, esto representa un porcentaje de probabilidad del 50%
+
+De una manera similar a la anterior unimos o sumamos las probabilidades de que el numero sea 1 y 6 que son cada una 1/6 una entre 6 posibilidades.
+\[
+P(1∪6) = P(1) + P(6) = 1/6 + 1/6 = 1/3
+\]
+
+Obteniendo un porcentaje para este caso de 33.3%
+
+**b)** Construya una función que simule el lanzamiento de un dado, y verifique mediante simulación que las probabilidades se aproximan a las probabilidades teóricas del punto anterior.
+
+
+```{r}
+Lanzamiento_Dado = function( n ){
+  # n es el número de lanzamiento
+  set.seed(4567)
+  sample( 1:6, size = n, replace = T)
+}
+
+Lanzamiento_Dado(n=10)
+
+round((table( Lanzamiento_Dado(n=1e3))/1e3) * 100, 2)
+round((table( Lanzamiento_Dado(n=1e4))/1e4) * 100, 2)
+round((table( Lanzamiento_Dado(n=1e5))/1e5) * 100, 2)
+round((table( Lanzamiento_Dado(n=1e6))/1e6) * 100, 2)
+```
+El resultado final es una tabla que muestra las frecuencias relativas de cada resultado en las simulaciones de lanzamiento de dados con diferentes números de lanzamientos (10, 1000, 10000, 100000 y 1000000). Al comparar estos porcentajes con las probabilidades teóricas calculadas en el numeral a), efectivamente observamos que las simulaciones se aproximan a las probabilidades teóricas a medida que aumenta el número de lanzamientos. Esto verifica que las probabilidades teóricas se cumplen en la práctica a medida que se realizan más lanzamientos con semillas mas ajustadas.
+
+
+**c)** Suponga ahora que el experimento es lanzar dos dados y registrar la suma de las caras resultantes, define el espacio muestral y calcula la probabilidad cada evento, simule el lanzamiento de dos dados 1000 veces y determine que numero es el más probable que salga junto a su probabilidad muestral.
+
+Para calcular manualmente las probabilidades de la suma de dos dados, primero definiremos el espacio muestral y luego calcularemos las probabilidades de cada evento.
+
+*Espacio Muestral:*
+
+El espacio muestral para el lanzamiento de dos dados consiste en todas las posibles combinaciones de resultados que podemos obtener al lanzar dos dados. Cada dado tiene 6 caras numeradas del 1 al 6, por lo que hay un total de 36 posibles resultados en el espacio muestral.
+
+El espacio muestral se verá así:
+
+```
+S={(1,1), (1,2), (1,3), (1,4), (1,5), (1,6),
+ (2,1), (2,2), (2,3), (2,4), (2,5), (2,6),
+ (3,1), (3,2), (3,3), (3,4), (3,5), (3,6),
+ (4,1), (4,2), (4,3), (4,4), (4,5), (4,6),
+ (5,1), (5,2), (5,3), (5,4), (5,5), (5,6),
+ (6,1), (6,2), (6,3), (6,4), (6,5), (6,6)}
+```
+
+**Probabilidades:**
+
+Ahora calcularemos las probabilidades de cada evento, es decir, la probabilidad de obtener cada posible suma. Para hacerlo, contaremos cuántas veces se produce cada suma en el espacio muestral y lo dividiremos por el número total de posibles resultados (36).
+
+A continuación, se muestran las sumas posibles y sus probabilidades:
+
+- Suma 2: Solo hay una forma de obtener una suma de 2, que es (1,1).
+  - Probabilidad: 1/36
+
+- Suma 3: Hay dos formas de obtener una suma de 3, que son (1,2) y (2,1).
+  - Probabilidad: 2/36 = 1/18
+
+- Suma 4: Hay tres formas de obtener una suma de 4, que son (1,3), (2,2) y (3,1).
+  - Probabilidad: 3/36 = 1/12
+
+- Suma 5: Hay cuatro formas de obtener una suma de 5, que son (1,4), (2,3), (3,2) y (4,1).
+  - Probabilidad: 4/36 = 1/9
+
+- Suma 6: Hay cinco formas de obtener una suma de 6.
+  - Probabilidad: 5/36
+
+- Suma 7: Hay seis formas de obtener una suma de 7.
+  - Probabilidad: 6/36 = 1/6
+
+- Suma 8: Hay cinco formas de obtener una suma de 8.
+  - Probabilidad: 5/36
+
+- Suma 9: Hay cuatro formas de obtener una suma de 9.
+  - Probabilidad: 4/36 = 1/9
+
+- Suma 10: Hay tres formas de obtener una suma de 10.
+  - Probabilidad: 3/36 = 1/12
+
+- Suma 11: Hay dos formas de obtener una suma de 11.
+  - Probabilidad: 2/36 = 1/18
+
+- Suma 12: Solo hay una forma de obtener una suma de 12, que es (6,6).
+  - Probabilidad: 1/36
+
+**Número Más Probable:**
+
+El número más probable que salga es la suma 7, con una probabilidad de 6/36 o 1/6. Esto se debe a que hay seis formas diferentes de obtener una suma de 7, lo que lo convierte en el resultado más común cuando lanzas dos dados.
+
+Podemos verificar estos cálculos ejecutando la función `Lanzamiento_Dos_Dados` en R y observando las frecuencias relativas de las sumas en la salida de la simulación.
+
+
+```{r}
+Lanzamiento_Dos_Dados = function( n ){
+  set.seed(1234)
+  dado1 = sample( 1:6, size = n, replace = T)
+  dado2 = sample( 1:6, size = n, replace = T)
+  return( dado1 + dado2 )
+}
+
+# Test
+
+round((table( Lanzamiento_Dos_Dados(n=1e3)) / 1e3) * 100, 2)
+
+```
+Las salidas de nuestra simulación se aproximan bastante bien a los cálculos teóricos que hemos realizado previamente.
+
+
+d) Construya una función que simule el lanzamiento de un dado cargado, en el cual los impares tienen el doble de probabilidad de salir que pares. Simule el lanzamiento de 39000 dados y compruebe que el dado ésta bien cargado
+
+Para calcular manualmente las probabilidades de un dado cargado en el cual los números impares tienen el doble de probabilidad que los pares, primero definiremos el espacio muestral y luego calcularemos las probabilidades de cada evento.
+
+*Espacio Muestral:*
+
+El espacio muestral para el lanzamiento de un dado normal (sin carga) consta de los números del 1 al 6, cada uno con una probabilidad de 1/6. Para un dado cargado, asignaremos probabilidades diferentes a cada número, de acuerdo con la especificación.
+
+**Probabilidades en el Dado Cargado:**
+
+- Para los números impares (1, 3, 5): Cada uno tiene el doble de probabilidad que los pares, por lo que asignamos una probabilidad de 2x a los impares.
+
+- Para los números pares (2, 4, 6): Asignamos una probabilidad normal de x a los pares, de modo que la suma de todas las probabilidades sea igual a 1.
+
+Para encontrar el valor de x (la probabilidad asignada a los números pares), podemos utilizar la ecuación:
+
+\[2x + 2x + 2x + x + x + x = 1\]
+
+Resolviendo la ecuación:
+
+\[9x = 1\]
+\[x = 1/9\]
+
+Por lo tanto, la probabilidad asignada a los números pares es 1/9, y la probabilidad asignada a los números impares es 2/9.
+
+**Probabilidades en el Dado Cargado:**
+
+Probabilidad de obtener 1: (2 partes) / 9 = 2/9
+Probabilidad de obtener 2: (1 parte) / 9 = 1/9
+Probabilidad de obtener 3: (2 partes) / 9 = 2/9
+Probabilidad de obtener 4: (1 parte) / 9 = 1/9
+Probabilidad de obtener 5: (2 partes) / 9 = 2/9
+Probabilidad de obtener 6: (1 parte) / 9 = 1/9
+Con estas probabilidades corregidas, ahora puedes proceder a realizar la simulación de lanzar 39,000 dados y verificar que las frecuencias relativas se aproximen a estas probabilidades (2/9, 1/9, 2/9, 1/9, 2/9, 1/9).
+
+**Simulación y Comprobación:**
+
+Ahora que hemos definido las probabilidades para el dado cargado, podemos simular el lanzamiento de 39,000 dados y verificar que las frecuencias relativas se aproximen a estas probabilidades (2/9, 1/9, 2/9, 1/9, 2/9, 1/9) lo que es equivalente a (22.2%, 11.11%,22.2%, 11.11%,22.2%, 11.11%)
+
+
+```{r}
+Lanzamiento_Dado_Cargado = function( n ){
+  # n es el número de lanzamiento
+  set.seed(1234)
+  sample( 1:6, size = n, replace = T, prob = c(2/9, 1/9, 2/9, 1/9, 2/9, 1/9))
+}
+
+round( (table( Lanzamiento_Dado_Cargado(n=3.9e4))/ 3.94e4) * 100, 2)
+```
+Nuevamente, nuestros resultados de simulación se aproximan a los valores teóricos.
+
+### ***Ejercicio 3***
+
+En una fábrica de dispositivos electrónicos, el 10% de los productos son defectuosos.
+De los productos defectuosos, el 80% son identificados por el control de calidad. De los productos
+no defectuosos, el 5% son incorrectamente identificados como defectuosos.
+
+**a)** Calcula la probabilidad de que un producto seleccionado al azar sea defectuoso, dado que fue
+identificado como tal por el control de calidad.
+
+```{r}
+( p_a = dbinom(3, 10, 0.3))
+```
+```{r}
+# Probabilidad de que un producto sea defectuoso
+p_defectuoso <- 0.10
+
+# Probabilidad de que el control de calidad identifique correctamente un producto defectuoso
+p_identificacion_correcta <- 0.80
+
+# Probabilidad de que el control de calidad identifique incorrectamente un producto no defectuoso
+p_identificacion_incorrecta <- 0.05
+
+# Probabilidad de que un producto no sea defectuoso
+p_no_defectuoso <- 1 - p_defectuoso
+
+# Probabilidad de que un producto sea identificado como defectuoso por el control de calidad
+p_identificado_como_defectuoso <- (p_identificacion_correcta * p_defectuoso) + (p_identificacion_incorrecta * p_no_defectuoso)
+
+# Probabilidad de que un producto sea defectuoso dado que fue identificado como tal por el control de calidad
+p_defectuoso_dado_identificado <- (p_identificacion_correcta * p_defectuoso) / p_identificado_como_defectuoso
+
+p_defectuoso_dado_identificado
+
+```
+
+Este código primero define las probabilidades relevantes, calcula la probabilidad de que un producto sea identificado como defectuoso por el control de calidad y luego calcula la probabilidad condicional de que un producto sea defectuoso dado que fue identificado como tal por el control de calidad.
+
+**b)** Simule el proceso de fabricación de 1000 dispositivos electrónicos, de tal forma que el 10% de
+estos sean defectuosos, y cree una variable que se llame “dispositivo” y guarde el
+funcionamiento de estos como “defectuoso” o “no defectuoso”.
+
+```{r}
+N <- 1000
+set.seed(37)
+dispositivo <- sample (c("defectuoso", "no defectuoso"),N, replace = TRUE, prob = c(0.1,0.9))
+table(dispositivo)
+```
+En este código, se está simulando el proceso de fabricación de 1000 dispositivos electrónicos, con la condición de que el 10% de estos sean defectuosos. Se crea una variable llamada "dispositivo" que almacenará el estado de cada dispositivo como "defectuoso" o "no defectuoso".
+El resultado será una tabla que muestra cuántos dispositivos se consideraron "defectuosos" y cuántos se consideraron "no defectuosos" en la simulación. Dado que se utilizó una probabilidad del 10% para los dispositivos defectuosos, es de esperar que aproximadamente el 10% de los dispositivos en la muestra sean "defectuosos" como es el 96 (valor aproximado al teorico 100).
+
+**c)** Cree una segunda variable llamada “testCalidad” que simule la identificación de los
+defectuosos, para ello tenga en cuenta las tasas falsos positivo y falsos negativos del enunciado.
+
+```{r}
+testCalidad <- rep ("0", N)
+n <- sum (dispositivo == "defectuoso")
+
+testCalidad[dispositivo == "defectuoso"] <- sample (c("Ident Defect", "No Ident defect"), n, replace = TRUE, prob = c(0.8,0.2))
+
+n2 <- sum(dispositivo == "no defectuoso")
+testCalidad[dispositivo == "no defectuoso"]<- sample (c("Ident Defect", "No Ident defect"), n2, replace = TRUE, prob = c(0.05,0.95))
+
+table(dispositivo, testCalidad)
+```
+En este punto, se está creando una segunda variable llamada "testCalidad" que simula la identificación de los dispositivos defectuosos por parte del control de calidad. Para hacerlo, se tienen en cuenta las tasas de falsos positivos y falsos negativos mencionadas en el enunciado del ejercicio.
+
+Finalmente, se utiliza la función table para contar y mostrar en una tabla la relación entre los estados reales de los dispositivos ("dispositivo") y cómo fueron identificados por el control de calidad ("testCalidad"). La tabla mostrará la cantidad de dispositivos defectuosos y no defectuosos y cómo se identificaron. Esto permite evaluar la efectividad del control de calidad en la identificación de dispositivos defectuosos.
+
+Este ejercicio combina cálculos teóricos y simulaciones para explorar la probabilidad condicional y verificar si un proceso de identificación de productos defectuosos cumple con las tasas de falsos positivos y falsos negativos especificadas.
+
+## **Bloque 2**
+
+### **Ejercicio 4**
+
+En una tienda en línea, se sabe que el 30% de los clientes que visitan el sitio web finalmente realizan una compra. Supongamos que seleccionamos al azar a 10 clientes y queremos analizar cuántos de ellos realizarán una compra.
+
+**a)** Calcular la probabilidad de que exactamente 3 de los 10 clientes seleccionados hayan realizado una compra.
+```{r}
+( p_a = dbinom(3, 10, 0.3))
+```
+Como podemos ver, para saber cuál es la probabilidad de que 3 de los 10 sean seleccionados, se debe usar la función dbinom, pasándole los parámetros de que número queremos hallar la probabilidad, el tamaño de la muestra y la probabilidad de que ocurra un suceso.
+En este caso la respuesta nos da que la probabilidad es del **0.2668279 (26.68% aproximadamente).**
+
+**b)** Calcular la probabilidad de que al menos 7 de los 10 clientes seleccionados hayan realizado una
+compra.
+```{r}
+( p_b = 1 - pbinom(6, 10, 0.3))
+```
+En este caso debemos hallar el complemento de la posibilidad de que al menos 7 de los 10 clientes sean seleccionados. En este caso hacemos uso de pbinom, que nos ayuda a sacar la probabilidad de que un conjunto de eventos ocurra y se lo restamos a 1, ya que es el complemento, para poder conseguir la probabilidad real, que nos dió de 1%.
+
+**c)** Simular 500 veces el proceso descrito, calcule la tabla de frecuencias relativas, haga un gráfico de esta distribución y compárelo con el teórico.
+
+```{r}
+set.seed(1234)
+x = rbinom(500, 10, 0.3)
+fr = table(x) / 500
+fr_teor = dbinom(0:8, 10, 0.3)
+plot(fr, main="Probabilidad")
+lines(0:8,fr_teor, col="orange")
+```
+En este caso estamos sacando las probabilidades en una muestra de 500, para esto usaremos rbinom que nos va a ayudar a sacar la muestra aleatoria de datos, que luego ingresamos a la tabla y la mostramos posteriormente en un gráfico.
+
+Con relación al gráfico anterior, vemos la comparación entre las probabilidades teóricas y las experimentales. De ahí, podemos concluir que la probabilidad experimental no se aleja tanto de la teórica debido a la cantidad de simulaciones realizadas para obtener tales datos. En algunos casos, sí hay una mayor diferencia, pero en general podemos indicar que para efectos de la praçtica experimental son útiles.
+
+### **Ejercicio 5** 
+En una estación meteorológica, se ha observado que en promedio ocurren 2 tormentas eléctricas por semana en una determinada región. Queremos analizar la probabilidad de que ocurran cierto número de tormentas eléctricas en una semana.
+
+**a)** Simular 1000 veces el número de tormentas eléctricas que ocurren en una semana.
+```{r}
+set.seed(1234)
+x = rpois(1000, 2)
+fr = table(x) / 1000
+plot(fr)
+```
+En este caso usaremos el rpois para sacar la muestra, para este caso estamos usando una función que tiene 2 parametros, el primero que es el numero de pruebas aleatorias que se quiere crear, y el segundo es el promedio de tormentas que hay en la region cada semana.
+En la gráfica, podemos evidenciar que la mayor probabilidad la tiene el evento de que ocurran dos tormentas a la semana; de ahí en adelante, la probabilidad va reduciéndose considerablemte a medida que aumenta el número de tormentas (x).
+
+**b)** Calcular la probabilidad de que exactamente 3 tormentas eléctricas ocurran en una semana.
+```{r}
+dpois(3,2)
+```
+Para calcular la probabilidad de que solo ocurran 3 tormentas se usa el dpois y se pone como primer parámetro, el námero de ocurrencias que se necesita y como segundo parámetro, el promedio.
+
+La probabilidad de que exactamente 3 tormentas eléctricas ocurran en una semana es de **0.180447 (18.04% aproximadamente)**.
+
+**c)** Calcular la probabilidad de que más de 4 tormentas eléctricas ocurran en una semana.
+```{r}
+1 - ppois(4, 2)
+```
+Para calcular la probabilidad de que ocurran mas de 4, se debe hallar el complemento y restarselo a 1.
+
+La probabilidad de que más de 4 tormentas eléctricas ocurran en una semana es de **0.05265302 (5,26% aproximadamente)**.
+
+
+### **Ejercicio 6**
+
+Usando las funciones programadas en el Bloque 1 simule el experimento de lanzar 5 dados y registrar la media de estos lanzamientos.
+
+**a)**  Simule el experimento 5000 veces y guarde las medias de lanzar 5000 veces 5 dados en una variable llamada "medias".
+
+A continuación se muestran algunas de las 5000 medias calculadas:
+```{r}
+set.seed(1234)
+suma_cinco_dados = function(n){
+    d1 = sample(1:6, size=n, replace=T)
+    d2 = sample(1:6, size=n, replace=T)
+    d3 = sample(1:6, size=n, replace=T)
+    d4 = sample(1:6, size=n, replace=T)
+    d5 = sample(1:6, size=n, replace=T)
+    return(d1+d2+d3+d4+d5)
+}
+
+# Metemos los resultados en este vector
+(medias = suma_cinco_dados(n=5000)/5)
+```
+
+**b)**  Grafique el histograma de las medias.
+
+```{r}
+hist(medias, freq = F, main = 'Histograma de promedios al lanzar 5 dados')
+```
+En el gráfico anterior, podemos evidenciar que al realizar las 5000 medias, el resultado que más veces se obtuvo en el tal cálculo fueron los comprendidos entre el 3 y el 4. Por lo tanto, la probabilidad de que salga el 3 o el 4 a la hora de lanzar 5 dados (condición inicial del ejercicio) es mayor que para el resto de números.
+
+**c)**  Calcule la media y la varianza del vector medias, grafique la media como una línea vertical sobre el histograma, y adicione dos líneas verticales a ± una desviación estándar de la media.
+
+```{r}
+# Calculamos la media y la desviación estandar
+media = mean(medias)
+s = sd(medias)
+
+cat('Media: ', media, '\n')
+cat('Desvación estandar: ', s, '\n')
+```
+
+Hicimos una función para graficar este histograma con cualquier número de intervalos.
+
+```{r}
+histograma = function(presicion = 10){
+    
+    # Creamos un histograma con las medias, con la presicion
+    #   deseada
+    hist(medias, freq = F, breaks = presicion, main = 'Histograma de promedios al lanzar 5 dados')
+    
+    # Línea de distribución normal
+    x = seq(0,7,0.01)
+    lines(x, dnorm(x, mean = media, sd=s), col='green')
+    
+    #líneas verticales y leyenda
+    abline(v = media, col = 'blue', lwd = 2)
+    abline(v = media + s, col = 'red', lwd = 1.5)
+    abline(v = media - s, col = 'red', lwd = 1.5)
+    legend('topright',
+           legend = c(
+               'media = 3.5',
+               'media ± sd',
+               'distr normal'
+           ),
+           lwd = 2,
+           col=c(
+               'blue',
+               'red',
+               'green'
+           )
+    )
+    legend('bottomright',
+           legend = 'sd = 0.76',
+    )
+    
+}
+```
+
+**Histograma común:**
+
+```{r}
+histograma()
+```
+
+**Histograma con el doble de intervalos:**
+
+```{r}
+histograma(20)
+```
+
+Vemos que los promedios de los lanzamientos siguen la función de la distribución normal. Mientras más dados se tiren y se grafique el histograma con más intervalos, más se asemejará a la distribución normal y por lo tanto a la media.
+
+
+## **Bloque 3**
+
+### **Ejercicio 7**
+
+En un concurso de lanzamiento de dardos, los participantes tienen que lanzar un dardo hacia un tablero circular. La posición donde aterrice el dardo en el tablero se puede representar como un número entre 0 y 1, donde 0 representa el centro del tablero y 1 representa el borde exterior. Se sabe que la posición del aterrizaje sigue una distribución uniforme
+
+**a)** Generar 1000 lanzamientos simulados de dardos y almacenar las posiciones de aterrizaje en un vector.
+```{r}
+# Generar 1000 lanzamientos de dardos
+set.seed(1234)  
+(lanzamientos = runif(1000, min = 0, max = 1))
+```
+
+**b)** Calcular la frecuencia relativa de dardos que aterrizan en la zona central del tablero, definida como el intervalo [0.2, 0.4].
+```{r}
+# Frecuencia relativa de [0.2, 0.4]
+frecuencia_central = sum(lanzamientos >= 0.2 & lanzamientos <= 0.4) / 1000
+
+# Resultados
+cat("Frecuencia relativa en [0.2, 0.4]:", frecuencia_central, "\n")
+```
+
+**c)** Calcular la frecuencia relativa de dardos que aterrizan en el borde exterior del tablero, definido como el intervalo [0.8, 1].
+```{r}
+# Frecuencia relativa de [0.8, 1.0]
+frecuencia_borde = sum(lanzamientos >= 0.8 & lanzamientos <= 1) / 1000
+
+
+cat("Frecuencia relativa en [0.8, 1.0]:", frecuencia_borde, "\n")
+```
+Las frecuencias relativas de los dos intervalos tienen sentido, porque tanto [0.2-0.4] como [0.8, 1] son el 20% de [0, 1]. Así que al ser una distribución uniforme, cada uno contendrá un 20% de los lanzamentos.
+
+Vemos que efectivamente siguen una distribución contínua, todos los intervalos se van a ir acercando a 1 mientras más lanzamientos se hagan.
+
+```{r}
+
+hist(lanzamientos, freq = F, main = 'Histograma de lanzamiento de dardos', breaks = 20)
+abline(v = 0.2, col='blue', lwd = 2)
+abline(v = 0.4, col='blue', lwd = 2)
+abline(v = 0.8, col='red', lwd = 2)
+abline(v = 1, col='red', lwd = 2)
+abline(h = 1, col='green', lwd = 2)
+
+legend('bottomright',
+       legend = c(
+           '[0.2, 0.4]',
+           '[0.8, 1.0]',
+           '1'
+       ),
+       lwd = 2,
+       col=c(
+           'blue',
+           'red',
+           'green'
+       )
+)
+
+```
+Por lo tanto, en la gráfica anterior, se evidencia como aproximadamente al realizar esa cantidad de lanzamientos se va cumpliendo de cierta forma la distribución normal que los rige. Si se deseara obtener unos resultados mucho más cercanos a lo teórico, se deberían realizar más simulaciones del lanzamiento.
+
+### **Ejercicio 8**
+
+En un laboratorio de investigación, se mide la cantidad de tiempo que un proceso experimental tarda en completarse. Se ha observado que este tiempo sigue una distribución normal con una media de 30 minutos y una desviación estándar de 5 minutos. Si el laboratorio planea asignar 25 minutos para el proceso experimental en la próxima prueba:
+
+**a)** ¿Cuál es la probabilidad de que el tiempo real del proceso experimental exceda los 25 minutos presupuestados?
+
+```{r}
+( p_a = 1 - pnorm(25, 30, 5))
+```
+Tenemos entonces que, la probabilidad de que el tiempo real del proceso experimental exceda los 25 minutos presupuestados es de **0.8413447 (84,13% aproximadamente).**
+
+
+**b)** ¿Cuánto tiempo debería asignarse para el proceso experimental de manera que la probabilidad de que el tiempo exceda el tiempo presupuestado en una prueba sea solamente 0.1?
+
+```{r}
+qnorm(0.9, 30, 5)
+
+```
+Para cumplir con lo requerido con relación al tiempo excedido, debería asignarse **36.40776** minutos para el tiempo del proceso experimental.
+
+
+**c)** ¿Cuál es la probabilidad de que el tiempo necesario para completar el proceso experimental esté entre 28 y 32 minutos en una prueba particular?
+
+Para calcular la frecuencia acumulada se usa pnorm(#, media, desv_est).
+```{r}
+pnorm(q = 32, mean = 30, sd = 5) - pnorm(q = 28, mean = 30, sd = 5)
+```
+
+La probabilidad de que el tiempo necesario para completar el proceso experimental esté entre 28 y 32 minutos en una prueba particular es de **0.3108435 (31,08% aproximadamente).**
+
+
+### **Ejercicio 9**
+
+Grafique la función de densidad de probabilidad normal para un valor fijo de la media
+y distintos valores para la desviación estándar ¿Qué concluye acerca de la desviación estándar?
+```{r}
+x <- seq(-10, 10, 0.01)
+plot(x, dnorm(x), type = "l")
+lines(x, dnorm(x, sd = 1.5), col = "green")
+lines(x, dnorm(x, sd = 2), col = "yellow")
+lines(x, dnorm(x, sd = 3), col = "red")
+legend("topright",
+       legend = c( "sd = 1",
+                   "sd = 1.5",
+                   "sd = 2",
+                   "sd = 3"),
+       lwd = 2,
+       col = c("black", "green", "yellow", "red"))
+```
+
+A partir de lo anterior, es posible concluir que a medida que se va aumentando la desviación estándar en el ejercicio, la gráfica en forma de campana se va aplanando cada vez más. Esto se da debido a que al aumentar la desviación estándar, los datos que se generen van a estar cada vez más dispersos unos de otros, en otras palabras, se van a alejar cada vez más de la media. Por ello, en conjuntos de datos con una desviación estándar pequeña los datos tienden a ser mucho más similares a la media, y por lo tanto forman esa notable campana en la gráfica. Pero, cuando la desviación estándar es más grande, la gráfica obtenida es mucho más plana debido a que ya son muchos menos datos los que tienden a la media.
+
+
+### **Ejercicio 10**
+
+El tiempo de vida (en años) de una bombilla sigue una distribución exponencial con una tasa de falla de 0.05. Calcular la probabilidad de que una bombilla dure al menos 15 años.
+
+- Consideremos la variable aleatoria x: tiempo de vida de la bombilla.
+  Se tiene que **x~Exp(lambda=0.05)**.
+```{r}
+x <- seq(0, 100, 0.01)
+plot(x, dexp(x, 0.05), type = "l")
+```
+Arriba se puede visualizar la gráfica donde se ilustra cómo a medida que se aumenta la cantidad de años de duración de la bombilla, la probabilidad de que la bombilla dure esa cantidad de años, dada por la distribución exponencial, va siendo cada vez menor. Lo cual sigue de cierta forma la lógica en la vida real, donde la probabilidad de que un bombillo dure más y más años, es cada vez menor a medida que pasa el tiempo.
+
+
+Ahora, con relación a la probabilidad de que una bombilla dure al menos 15 años, calculamos lo siguiente:
+```{r}
+(1 - pexp(15, 0.05))
+```
+Y obtenemos que dicha probabilidad es de **0.4723666 (47,23% aproximadamente).**
+
+

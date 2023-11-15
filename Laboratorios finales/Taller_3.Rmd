@@ -1,0 +1,612 @@
+---
+title: "Laboratorio 3 - Estadística general"
+output: html_notebook
+---
+
+***Integrantes:***
+
+-   Víctor Manuel Botero Gómez.
+
+-   Camilo Palacio Restrepo.
+
+-   Esteban Trujillo Carmona.
+
+-   Esteban Vergara Giraldo.
+
+# Bloque 1.
+
+## Problema 1.
+
+Importe la base de datos ventacasas.csv, los cuales son datos inmobiliarios recogidos de la ciudad de Ames, Iowa, EE. UU. entre 2006 y 2010. Para esta práctica de laboratorio, restringiremos nuestra atención a solo dos variables:
+
+- **Área:** superficie habitable de la casa sobre el suelo en pies cuadrados.
+
+- **Precio:** precio de venta en U.S. dólares.
+
+
+**a)** Realice un análisis descriptivo de la distribución de las variables calculando algunas estadísticas de resumen y haciendo el histograma.
+
+Primero importamos el dataset
+```{r}
+library(readr)
+ventacasas <- read.csv("F:/Desktop/UNIVERSIDAD/SEMESTRE_6/Estadística_General/Taller_3/ventacasas.csv")
+```
+
+```{r}
+area = ventacasas$Area
+
+media_pob = mean(area)
+sd_pob    = sd(area)
+hist(area)
+abline(v= media_pob, col='red', lwd = 2)
+```
+Parece que los datos distribuyen más o menos normal, con una media de:
+```{r}
+cat('Media:', media_pob)
+```
+Y una desviación estándar de:
+```{r}
+cat('Desviación estándar:', sd_pob)
+```
+Una desviación estándar un poco grande comparada a la media, los datos están bastante dispersos entre sí.
+
+
+**b)** Para el atributo área, tome muestras de tamaño n = 10, n = 50, n = 100, n = 1500 y n = 2000 cada una, calcule la media para cada muestra, realice el histograma y compare con el valor de la media poblacional obtenido en el  ítem anterior. ¿Cuál de las muestras proporciona una estimación más precisa de la media poblacional?
+
+Crearemos una función para replicar este proceso fácilmente
+```{r}
+muestras_area = function(n){
+    set.seed(1234)
+    muestra = sample(area,n)
+    media_muestra = mean(muestra)
+    error = abs(media_muestra - media_pob)/media_pob  *100 #error del 13%
+    
+    hist(muestra,
+         main=n,
+         xlab="")
+    
+    abline(v= media_pob, col='green')
+    abline(v= media_muestra, col='red')
+    legend('topright',
+           legend = c("media poblacional", "media muestral"),
+           lwd = 2,
+           col=c('green', 'red')
+    )
+    
+    
+    return(c('La media de la muestra n =',n, 'dió una media muestral de',
+        media_muestra,', esta presenta un error del' ,error,'%'))
+}
+```
+```{r}
+n10 = muestras_area(10)
+```
+```{r}
+cat(n10)
+```
+```{r}
+n50 = muestras_area(50)
+```
+```{r}
+cat(n50)
+```
+
+```{r}
+n100 = muestras_area(100)
+```
+```{r}
+cat(n100)
+```
+
+```{r}
+n1500 = muestras_area(1500)
+```
+```{r}
+cat(n1500)
+```
+
+```{r}
+n2000 = muestras_area(2000)
+```
+```{r}
+cat(n2000)
+```
+El error de la media muestral respecto a la poblacional se va reduciendo mientras más grande es la muestra.
+Por lo tanto, es posible evidenciar que la muestra que proporciona una estimación más precisa de la media poblacional corresponde a la de tamaño de 2000, con un error del 0.23% apróximadamente. Esto se debe, precisamente al hecho de que a medida que el tamaño de la muestra se acerque cada vez más al de la población, la media muestral será cada vez más cercana a la media poblacional.
+
+**c)** Generar 5000 muestras de tamaño n = 10, n = 50 y n = 100 de la población (área), calcular la media de cada muestra y almacenar cada resultado en un vector. Luego trazar los histogramas. ¿Qué sucede con la distribución del muestreo? Concluir. 
+
+Creamos tres listas de las medias de 5000 poblaciones con n= 10, 50 y 100 respectivamente.
+
+El histograma de estas tres listas tiene un resultado muy interesante.
+
+(Ejecutar esta sección puede resultar un poco lento)
+```{r}
+promedios10   = rep(0,5000) #vector de 5000 ceros
+promedios50   = rep(0,5000) 
+promedios100  = rep(0,5000) 
+
+set.seed(1234)
+for(i in 1:5000){
+    promedios10[i] = mean(sample(area, 10))
+    promedios50[i] = mean(sample(area, 50))
+    promedios100[i] = mean(sample(area, 100))
+}
+
+par(mfrow = c(3,1)) #representa las graficas en 3 filas y una columna
+xlimits = range(promedios10)
+
+hist(promedios10, breaks = 25, xlim = xlimits, xlab="n=10")
+hist(promedios50, breaks = 25, xlim = xlimits, xlab="n=50")
+hist(promedios100, breaks = 25, xlim = xlimits,xlab="n=100")
+
+par(mfrow = c(1,1))
+```
+
+A partir de los gráficos anteriores es posible concluir que a medida que aumenta el tamaño de la muestra, la forma de la distribución se asemeja cada vez más a una distribución normal. Esto es una claro ejemplo del Teorema del Límite Central, el cual establece que, sin importar la forma de la población original, las medias de las muestras que sean suficientemente grandes, van a distribuirse de manera normal, de forma aproximada.
+
+Además, podemos indicar que la variabilidad de las medias muestrales disminuye a medida que aumenta el tamaño de la muestra, lo que significa que las estimaciones de la media poblacional son más precisas con muestras cada vez más grandes.
+
+
+## Problema 2.
+
+**a)** Repita los ítems (b) y (c) anteriores ahora para el atributo precio. Finalmente, calcule e informe su estimación de la media de la población.
+
+```{r}
+precio = ventacasas$Precio
+
+media_pob = mean(precio)
+sd_pob    = sd(precio)
+hist(precio)
+abline(v= media_pob, col='red', lwd = 2)
+```
+En este caso no se parece tanto a una distribución normal como tal. A partir de cálculos, se tiene una media de:
+```{r}
+cat('Media:', media_pob)
+```
+Y una desviación estándar de:
+```{r}
+cat('Desviación estándar:', sd_pob)
+```
+
+Ahora siguen los histogramas de las muestras n = 10, 50, 100, 1500 y 2000:
+```{r}
+set.seed(1234)
+muestras_precio = function(n){
+    muestra = sample(precio,n)
+    media_muestra = mean(muestra)
+    error = abs(media_muestra - media_pob)/media_pob  *100 #error del 13%
+    
+    hist(muestra,
+         main=n,
+         xlab="")
+    
+    abline(v= media_pob, col='green')
+    abline(v= media_muestra, col='red')
+    legend('topright',
+           legend = c("media poblacional", "media muestral"),
+           lwd = 2,
+           col=c('green', 'red')
+    )
+    
+    
+    return(c('La media de la muestra n =',n, 'dió una media muestral de',
+        media_muestra,', esta presenta un error del' ,error,'%'))
+}
+```
+```{r}
+n10 = muestras_precio(10)
+```
+```{r}
+cat(n10)
+```
+```{r}
+n50 = muestras_precio(50)
+```
+```{r}
+cat(n50)
+```
+
+```{r}
+n100 = muestras_precio(100)
+```
+```{r}
+cat(n100)
+```
+
+```{r}
+n1500 = muestras_precio(1500)
+```
+```{r}
+cat(n1500)
+```
+
+```{r}
+n2000 = muestras_precio(2000)
+```
+```{r}
+cat(n2000)
+```
+Aquí, el error de la media muestral respecto a la poblacional también se va reduciendo mientras más grande es la n de la muestra.
+Por lo tanto, es posible evidenciar de igual manera que la muestra que proporciona una estimación más precisa de la media poblacional corresponde a la de tamaño de 2000 (nuevamente), con un error del 0.58% apróximadamente. Esto se debe, precisamente al hecho de que a medida que el tamaño de la muestra se acerque cada vez más al de la población, la media muestral será cada vez más cercana a la media poblacional.
+
+
+Siguen los histogramas de las tres listas con 5000 muestras de n=10, 50 y 100.
+(Ejecutar esta sección puede resultar lento)
+```{r}
+promedios10   = rep(0,5000) #vector de 5000 ceros
+promedios50   = rep(0,5000) 
+promedios100  = rep(0,5000) 
+
+set.seed(1234)
+for(i in 1:5000){
+    promedios10[i] = mean(sample(precio, 10))
+    promedios50[i] = mean(sample(precio, 50))
+    promedios100[i] = mean(sample(precio, 100))
+}
+
+par(mfrow = c(3,1)) #representa las graficas en 3 filas y una columna
+xlimits = range(promedios10)
+
+hist(promedios10, breaks = 25, xlim = xlimits, xlab="n=10")
+hist(promedios50, breaks = 25, xlim = xlimits, xlab="n=50")
+hist(promedios100, breaks = 25, xlim = xlimits,xlab="n=100")
+
+par(mfrow = c(1,1))
+```
+A partir de los gráficos anteriores es posible concluir, de igual manera, que a medida que aumenta el tamaño de la muestra, la forma de la distribución se asemeja cada vez más a una distribución normal. Así también, la media de los promedios con muestra n, se va a ir asemejando cada vez a la media poblacional real.
+
+A continuación, se presenta el media de la lista de promedios con el n de las muestras más alto.
+```{r}
+mean(promedios100)
+```
+
+Y se puede evidenciar que no está tan lejano a la media poblacional real:
+```{r}
+media_pob
+```
+
+
+**b)** Simule 50,000 muestras aleatorias para Xprecio ∼ N (μ = mean(precio), σ = sd(precio)) tomando muestras de tamaño n = 100.
+
+- Calcule el promedio de cada una las 50,000 muestras aleatorias.
+
+- Construya el histograma de los 50,000 promedios muestrales. ¿Qué se puede concluir?
+
+
+Este es el histograma de las 50000 muestras aleatorias:
+```{r}
+media = mean(precio)
+standes = sd(precio)
+
+m = 50000
+n = 100
+prom = rep(0,m)  # vector para promedio muestral de cada simulacion
+
+set.seed(1234)
+
+for(i in 1:m){
+    prom[i] = mean(rnorm(n,media,standes))
+}
+hist(prom, freq=F, xlab=expression(bar(X) ))
+```
+Tendieron a tener el mismo comportamiento que la lista de las medias muestrales reales que sacamos en el punto "a". Es una buena aproximación el simularlo con la normal (y también es más rápido y barato computacionalmente). Al mismo tiempo, vemos que las medias muestrales del punto "a" sí siguen una distribución normal respecto a la media poblacional.
+
+- Realizar la gráfica de la distribución acumulada de los promedios y trazar una recta vertical por el promedio de la variable precio.
+
+Y este es el gráfico de su distribución acumulada.
+```{r}
+plot(ecdf(prom), main='', verticals=T, do.points= F, col.01line = NULL)
+abline(v= media, col='red')
+```
+En el gráfico anterior, podemos evidenciar como la mayoría de los promedios se acomodan en puntos cercanos a la media poblacional (precio), debido al comportamiento aproximadamente normal que tiene. Por ello, la distribución acumulada empieza a aumentar rápidamente apenas se va a acercando más a la media poblacional por izquierda, y también sigue aumentando por derecha ya que hay valores que llegan a ser superiores a la media poblacional, y por lo tanto van por la derecha. Finalmente, la acumulada se estabiliza apenas se aleja lo suficiente de la media poblacional, de tal manera que tiende aproximadamente a un valor concreto.
+
+## Problema 3.
+
+Problema 3. Demuestre gráficamente (teorema central del límite) que v.a. discretas con distribución binomial y poisson respectivamente, con parámetros n, p = 0,5 y λ = 0,5, se pueden aproximar mediante una distribución normal con μ = 0,5. Tome valores para n de 10, 50, 100, 200, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000 y 10000. Realice interpretaciones.
+
+```{r}
+
+set.seed (123)
+n<-c (10,50,100,200,500,1000,2000,3000,4000,5000,6000,7000, 8000,9000,10000) 
+
+mean_binom<-function(n) {
+  x<-rbinom(n,1,0.5)
+  mean(x)
+}
+
+meanb<-unlist(lapply(n, mean_binom))
+
+mean_pois<-function(n) {
+  x<-rpois (n,0.5)
+  mean(x)
+}
+
+meanp<-unlist(lapply(n, mean_pois))
+
+mean_norm<-function(n) {
+  x<-rnorm(n, mean = 0.5)
+  mean (x)
+}
+
+meannor<-unlist(lapply(n, mean_norm))
+
+lgn_dat <-data.frame( n=rep(n, 3), med=c(meanb,meanp, meannor), dist=rep(c("Binomial", "Poisson", "Normal"),each=length(n)))
+library (ggplot2)
+ggplot (lgn_dat)+ geom_line (aes (x=n,y=med, color=dist))+labs (x = "n", у = "Media")+theme(text = element_text(size=14))+theme_grey(base_size = 16)
+
+```
+En el anterior gráfico es posible evidenciar el comportamiento del promedio de las distribuciones binomial, normal, y poisson aplicadas a una muestra de datos que aumenta progresivamente su tamaño, iniciando con 10 y terminando con 10000 (siguiendo un arreglo determinado de valores).
+
+Hay una respuesta clara al aumento del tamaño de la muestra. Se puede evidenciar que cuando el tamaño de n (muestra) es muy pequeño, la diferencia entre los promedios de las distribuciones es muy grande. Pero cuando n pasa a ser cada vez más grande, los promedios de las distribuciones tienden a ser muy similares entre sí.
+Ese comportamiento previamente descrito se rige por la Ley de los grandes números, la cual establece que el promedio de una muestra al azar de una población (muestra) de gran tamaño tenderá a estar cerca de la media de la población completa. Siendo esto precisamente lo que se evidenció finalmente cuando la muestra tomo valores mucho más grandes que al principio.
+
+# Bloque 2.
+
+## Problema 4. 
+
+Simule 500000 valores de X ∼ P(λ = 20) y calcule el promedio y la varianza. Seleccione una muestra aleatoria de n = 1000 y determine el promedio de esa muestra y la desviación estándar. Además, encuentre un intervalo de confianza del 95 % y otro del 99 % para μ. Concluya
+
+```{r}
+
+set.seed(10)
+N<-500000
+pobl <- rpois(N, 20) #Simular población
+n <- 1000
+muest <- sample(pobl, size = n) #Seleccionar muestra
+med_pobl <- mean(pobl) #Media poblacional (Parámetro)
+med_muest <- mean(muest) #Media muestral (Estimador)
+( error = ( abs(med_muest - med_pobl) / med_pobl) * 100)
+
+#Intervalo de confianza 95%
+alp <- 0.05 #nivel de confianza 95%
+z_lalp2 <- qnorm(1-alp/2)
+sd_muest <- sd(muest) # desviación estándar de muestra
+LI = med_muest - ( z_lalp2 * sd_muest /sqrt(n))
+LS = med_muest + ( z_lalp2 * sd_muest /sqrt(n))
+cat("Un intervalo de confianza aproximado al", 100*(1-alp),
+    "% para μ es [", LI, ",", LS, "]")
+```
+En este caso, se pidió calcular un intervalo de confianza del 95% para μ. Por lo tanto, previamente se realizaron los cálculos respectivos y se llegó al resultado que se puede visualizar encima. El significado de este resultado consiste en que, si se calcula el intervalo a partir de una muestra de datos, el 95% de las veces que se realice este proceso, el intervalo va a contener la media real de la población. Este intervalo del 95% será menos amplio que el del 99%, ya que brinda un poco menos de certeza con respecto a este último.
+
+
+```{r}
+
+#Intervalo de confianza 99%
+alp2 <- 0.01 #nivel de confianza 99%
+z_lalp3 <- qnorm(1-alp2/2)
+sd_muest2 <- sd(muest) # desviación estándar de muestra
+LI2 = med_muest - ( z_lalp3 * sd_muest2 /sqrt(n))
+LS2 = med_muest + ( z_lalp3 * sd_muest2 /sqrt(n))
+cat("Un intervalo de confianza aproximado al", 100*(1-alp2),
+    "% para μ es [", LI2, ",", LS2, "]")
+
+```
+En este otro caso, se pidió calcular un intervalo de confianza del 99% para μ. Por ello, previamente se realizaron los procedimientos necesarios y se llegó al resultado que se puede visualizar encima. La interpretación de este resultado consiste en que, si se calcula el intervalo a partir de una muestra de datos, teóricamente el 99% de las veces que se realice este proceso, el intervalo va a contener la media real de la población. Este intervalo del 99% será más amplio que el del 95%, ya que brinda más certeza con respecto a este último.
+
+En conclusión, cuando se trabaje con intervalos de confianza puntuales es necesario determinar cuán dispuesto se está a recibir un resultado que no sea acertado. Así, si no tan estrictamente necesario, se puede trabajar con nivel de confianza menor, como el 90%, y se recibirá un intervalo de confianza más pequeño a medida que se disminuya el nivel de confianza o certeza. Y pasará todo lo contrario si se requiere brindar un resultado más acertado, puesto que se usará un nivel de confianza más alto, como el 99%, donde se brindará un intervalo de confianza cada vez más amplio a medida que se aumente el nivel de certeza. 
+
+
+## Problema 5.
+
+Cargue el dataset mtcars, conjunto de datos incorporado en R.
+**1.** Realice un resumen y descripción de los atributos.
+
+Importamos el dataset mtcars.
+```{r}
+cars <- mtcars
+
+mpg = mtcars$mpg
+```
+- Sus variables son:
+
+1. mpg	        Millas/(US) por galón
+2. cyl	        Numero de cilindros
+3. disp        Desplazamiento (pulgadas cúbicas)
+4. hp	        Caballos de fuerza
+5. drat        Relación del eje trasero (transmisión de torque)
+6. wt	        Peso (1000 lbs)
+7. qsec        Tiempo que le toma recorrer 1/4 de milla
+8. vs	        Motor (0 = tipo v, 1 = recto)
+9. am	        Transmisión (0 = automática, 1 = manual)
+10. gear        Número de engranajes
+11. carb        Número de carburadores
+
+
+**2.** Usar algunos gráficos para visualizar la distribución de los valores de la variable mpg. Concluir
+
+Usaremos mpg
+
+- Sus datos se distribuyen de esta manera:
+
+```{r}
+media_mpg = mean(mpg)
+cat('Media de', media_mpg)
+```
+```{r}
+sd_mpg = sd(mpg)
+cat('Desviación estándar de', sd_mpg)
+```
+
+```{r}
+hist(mpg, breaks = 10)
+abline(v= mean(mpg), col='red', lwd=2)
+legend('topright',
+           legend = "media",
+           lwd = 2,
+           col='red'
+    )
+```
+Del gráfico y los cálculos previamente realizados es posible concluir que, en sí, estos datos obtenidos de mtcars no poseen una distribuión clara y definida; más bien, se encuentran dispersos y con concentraciones de datos variables y distantes. Esto se puede ver, de cierta manera, en el resultado obtenido al calcular la desviación estándar de los datos, donde, al compararla con la media poblacional, posee un valor considerablemente grande. De igual forma, la gráfica muestra claramente el comportamiento previamente descrito.
+
+
+**3.** Calcular el intervalo de confianza con una probabilidad del 95 % para la media de mpg con la distribución t-student. Concluir
+
+- Suponiendo que los datos de mtcars son sólo una muestra (y lo son), buscaremos un intervalo de confianza del 95% para la media poblacional del mpg de todos los carros del mundo (que sería la población). 
+
+Si la confianza es 95%, alpha es 0.05
+```{r}
+alpha = 0.05
+```
+El número de datos (n) es
+```{r}
+(n = length(mpg))
+```
+
+Saquemos t(1-alpha/2, n-1)
+(n-1 son los grados de libertad, y 1-alpha/2 es la probabilidad que queremos para que nos de su percentil, de esta forma se distribuye el error en ambos lados)
+
+```{r}
+(t_alpha2 = qt(1-alpha/2, df = n-1))
+```
+
+El intervalo estará dado por la media poblacional más o menos ese T estando multiplicado por la desviación estándar sobre la raíz del número de datos.
+
+```{r}
+lim_sup = media_mpg + t_alpha2 * sd_mpg / sqrt(n)
+lim_inf = media_mpg - t_alpha2 * sd_mpg / sqrt(n)
+cat("El intervalo de confianza del 95% es [", lim_inf, ",", lim_sup, "]")
+```
+Con un 95% de seguridad, la media poblacional del mpg de los carros del mundo, está en el intervalo [ 17.91768 , 22.26357 ]
+
+
+## Problema 6.
+
+El rector de una universidad quiere usar la media de una muestra aleatoria para estimar la cantidad promedio de tiempo que tardan los estudiantes en ir de una clase a la siguiente, y quiere ser capaz de afirmar con 99 % de confianza que el error es cuando mucho de 0.25 minutos. Si se puede suponer por
+experiencia que σ = 1,40 minutos, ¿cúan grande debe ser la muestra que se tome?
+α = 1 − 0,99, Z0,005 ≈ 2,57
+σ = 1,40
+E = 0,25
+
+
+El mínimo tamaño de muestra que con una confianza del 100(1 - (simbolo de alfa)%) garantiza que (símbolo épsilon) es el máximo error que se comete al estimar (símbolo miu) a través de la media muestral X barra es:
+```{r}
+(n=((2.57*1.4)/0.25)^2)
+
+```
+El tamaño de muestra mínimo calculado es aproximadamente 207.1297 Dado que el tamaño de la muestra debe ser un número entero (no puedes tener una fracción de una observación), debemos redondear hacia arriba al número entero más cercano. En este caso, se redondea a 208 como el tamaño de muestra mínimo necesario para garantizar que el error máximo sea de 0.25 con un nivel de confianza del 99%. Por lo que, a manera de respuesta a la pregunta inicial, se puede indicar que la muestra que se tome debe de ser de un tamaño de 208, para cumplir con los requisitos anteiormente enunciados en el ejercicio.
+
+
+# Bloque 3.
+
+## Problema 7.
+
+Suponga que un fabricante afirma que la vida media de una bombilla es mayor a 10,000 horas.En una muestra de 30 bombillas, se encontró que solo duran en promedio 9,900 horas. Suponga que la desviación estándar de la población es de 120 horas. ¿podemos rechazar la afirmación del fabricante?
+
+```{r}
+xbar=9900
+mu0=10000
+sigp=120
+n=30
+(zc = (xbar - mu0)/ (sigp/sqrt(n)))
+
+alpha=0.05
+z.alpha = qnorm(1-alpha)
+-z.alpha
+```
+Este ejercicio se basa en realizar una prueba de hipótesis para determinar si la afirmación del fabricante, que establece que la vida media de una bombilla es mayor a 10,000 horas, puede ser rechazada o no con base en la muestra de 30 bombillas.
+
+**Hipótesis nula (H0):**La vida media de las bombillas es igual o menor a 10,000 horas (µ ≤ 10,000 horas).
+**Hipótesis alternativa (H1):** La vida media de las bombillas es mayor a 10,000 horas (µ > 10,000 horas).
+En este caso, la hipótesis nula es la afirmación del fabricante, y la hipótesis alternativa es lo que queremos comprobar.
+
+**Estadístico de prueba (z):** Utilizamos el estadístico de prueba z para comparar la diferencia entre la media muestral (x̄) y la media poblacional hipotética (µ0), considerando la desviación estándar poblacional (σp) y el tamaño de la muestra (n):
+
+z = (x̄ - µ0) / (σp / √n)
+
+En nuestro caso, los valores son:
+
+**x̄ (media muestral)** = 9,900 horas
+**µ0 (media poblacional hipotética)** = 10,000 horas
+**σp (desviación estándar poblacional)** = 120 horas
+**n (tamaño de la muestra)** = 30 bombillas
+
+Se calcula z, que representa cuántas desviaciones estándar la media muestral está lejos de la media poblacional hipotética.
+
+**Nivel de significancia (α):**
+Estableces un nivel de significancia α (generalmente 0.05 o 5%), que determina cuán seguros queremos estar al tomar una decisión.
+
+**Regla de decisión:**
+La regla de decisión depende de la hipótesis alternativa:
+
+Si H1: µ > µ0, entonces se trata de una prueba de cola derecha.
+Si H1: µ < µ0, sería una prueba de cola izquierda.
+Si H1: µ ≠ µ0, sería una prueba de dos colas.
+En este caso, estámos realizando una prueba de cola derecha (H1: µ > 10,000 horas).
+
+Calculamos zα para el nivel de significancia α. Si el valor calculado de z es mayor que zα, entonces se rechaza la hipótesis nula.
+
+**Toma de decisión:**
+
+Si z > zα, rechazamos H0. Hay evidencia suficiente para afirmar que la vida media de las bombillas es mayor a 10,000 horas.
+Si z ≤ zα, no puedes rechazar H0. No hay evidencia suficiente para afirmar que la vida media de las bombillas es mayor a 10,000 horas.
+En tu caso, has calculado el valor de z y el valor crítico zα para un nivel de significancia α = 0.05. De acuerdo con tu cálculo, si z es mayor que -1.645 (zα), entonces rechazarás la hipótesis nula.
+
+**Interpretación:**
+
+Como Zα=-4.56 <  z0.95= -1.645, es decir , Zα pertenece a RR, entonces rechazamos H0 y concluimos que μ<10000; es decir, el fabricante está mintiendo.
+
+
+## Problema 8.
+
+Suponga que la etiqueta de una bolsa de galletas indica que hay como ḿaximo 2 gramos de grasa saturada en una sola galleta. En una muestra de 35 galletas, se encuentra que la cantidad media de grasa saturada por galleta es de 2,1 gramos. Suponga que la desviación est́andar de la muestra es 0.3 gramos. ¿Podemos rechazar la afirmacíon en la etiqueta de los alimentos?
+
+```{r}
+xbar = 2.1
+mu0= 2
+s = 0.3
+n=35
+(tc =(xbar - mu0)/(s/sqrt(n)))
+alpha = 0.05
+(t_alpha = qt(1-alpha, n-1))
+```
+
+Se realiza un análisis de prueba de hipótesis para determinar si se puede rechazar la afirmación en la etiqueta de las galletas de acuerdo a la muestra y los valores proporcionados. Para saber si podemos rechazar la afirmación, debemos realizar un análisis de prueba de hipótesis.
+
+**Hipótesis nula (H0):** La cantidad media de grasa saturada en una galleta es de 2 gramos o menos.
+**Hipótesis alternativa (H1):** La cantidad media de grasa saturada en una galleta es mayor de 2 gramos.
+
+xbar es la media muestral (2.1 gramos).
+mu0 es el valor afirmado en la etiqueta (2 gramos).
+s es la desviación estándar de la muestra (0.3 gramos).
+n es el tamaño de la muestra (35 galletas).
+Luego, calculas el estadístico de prueba tc utilizando la fórmula de prueba t:
+
+tc= (xbar=mu0)/(s/sqrt(n))
+
+Después, se elige un nivel de significancia (alpha), que en este caso es 0.05, y calculamos el valor crítico de t (t_alpha) para grados de libertad n-1 (34).
+
+Como estamos comparando la cantidad media real de grasa saturada en las galletas con el valor máximo permitido en la etiqueta (2 gramos). La hipótesis nula (H0) es que la cantidad media de grasa saturada en las galletas es igual o menor a 2 gramos (como se afirma en la etiqueta), y la hipótesis alternativa (H1) es que la cantidad media de grasa saturada es mayor de 2 gramos.
+
+Dado que tc = 1.972027 es mayor que t_alpha = 1.690924, rechazamos la hipótesis nula (H0). Esto significa que, con un nivel de significancia del 0.05 (alpha = 0.05), hay evidencia suficiente para concluir que la cantidad media de grasa saturada en las galletas es mayor de 2 gramos, lo que contradice la afirmación en la etiqueta.
+
+En resumen, basándonos en la prueba estadística, podemos rechazar la afirmación en la etiqueta de las galletas, ya que la cantidad media de grasa saturada parece ser mayor por 2 gramos.
+
+
+
+## Problema 9. 
+
+¿Cuál es el tamaño de la menor muestra requerida para estimar una proporción desconocida de clientes quienes pagarían por un servicio adicional hasta dentro de un error máximo de 0.06 con al menos 95 % de confianza? ¿Cuál será el tamaño de muestra requerido si la proporción a estimar es al menos de 0.8?
+
+```{r}
+(((qnorm(0.975)^2)*0.8*(1-0.8))/(0.06)^2)
+```
+
+El tamaño de la muestra requerido para estimar una proporción de al menos 0.8 con un error máximo de 0.06 y un nivel de confianza de 95% es de 170.73.
+Acá qnorm se está usando para hallar el valor crítico si el valor de confianza es del 95%. El 0.8 es la proporción a estimar, mientras que 1 - 0.8 que representa la proporción de personas que no caen en la categoría.
+
+
+## Problema 10. 
+
+Una aerolínea afirma que tan solo 6 % de todo el equipaje nunca se encuentra. Si, en una muestra aleatoria, 17 de 200 piezas de equipaje perdido no se encuentran, pruebe la hipótesis nula p = 0,06 contra la hipótesis alternativa p > 0,06, con un nivel de significancia de 0.05.
+
+Para realizar el cálculo requerido, se usa la siguiente ecuación, con sus valores ya reemplazados:
+```{r}
+(((17/200)-0.06)/sqrt((0.06*(1-0.06))/200))
+(qnorm(1-0.05))
+```
+
+Calculamos el valor de z usando la fórmula y la comparamos con el valor crítico de la distribución normal.
+Como el estadístico no pertenece a región de rechazo, no rechazamos la hipótesis nula. Ya que Zc (Z crítico) es menor a Z(1-alpha) es decir Z(0.95).En otras palabras, como 1.489 < 1.645 no puedo rechazar la hipótesis nula con un nivel de significancia del 0.05.
+
+Así, a manera de respuesta al problema, se puede decir que lo que la aerolínea está indicando con relación a la cantidad de equipaje que se pierde **es cierto.**
