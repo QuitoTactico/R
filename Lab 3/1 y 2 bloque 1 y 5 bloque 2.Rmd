@@ -1,0 +1,350 @@
+---
+title: "1 Y 2 BLOQUE 1, Y 5 BLOQUE 2"
+output: html_notebook
+---
+
+# Bloque 1
+
+## Problema 1
+
+### a)
+
+Primero importamos el dataset
+```{r}
+library(readr)
+ventacasas <- read.csv("C:/Users/Esteban/Downloads/-CODE-/R/Lab 3/ventacasas.csv")
+```
+
+```{r}
+area = ventacasas$Area
+
+media_pob = mean(area)
+sd_pob    = sd(area)
+hist(area)
+abline(v= media_pob, col='red', lwd = 2)
+```
+Parece que los datos distribuyen más o menos normal, con una media de:
+```{r}
+cat('Media:', media_pob)
+```
+Y una desviación estándar de:
+```{r}
+cat('Desviación estándar:', sd_pob)
+```
+Una desviación estándar un poco grande comparada a la media, los datos están bastante esparcidos.
+
+
+### b)
+
+Crearemos una función para replicar este proceso fácilmente
+```{r}
+muestras_area = function(n){
+    set.seed(1234)
+    muestra = sample(area,n)
+    media_muestra = mean(muestra)
+    error = abs(media_muestra - media_pob)/media_pob  *100 #error del 13%
+    
+    hist(muestra,
+         main=n,
+         xlab="")
+    
+    abline(v= media_pob, col='green')
+    abline(v= media_muestra, col='red')
+    legend('topright',
+           legend = c("media poblacional", "media muestral"),
+           lwd = 2,
+           col=c('green', 'red')
+    )
+    
+    
+    return(c('La media de la muestra n =',n, 'dió una media muestral de',
+        media_muestra,', esta presenta un error del' ,error,'%'))
+}
+```
+```{r}
+n10 = muestras_area(10)
+```
+```{r}
+cat(n10)
+```
+```{r}
+n50 = muestras_area(50)
+```
+```{r}
+cat(n50)
+```
+
+```{r}
+n100 = muestras_area(100)
+```
+```{r}
+cat(n100)
+```
+
+```{r}
+n1500 = muestras_area(1500)
+```
+```{r}
+cat(n1500)
+```
+
+```{r}
+n2000 = muestras_area(2000)
+```
+```{r}
+cat(n2000)
+```
+El error de la media muestral respecto a la poblacional se va reduciendo mientras más grande es la muestra.
+
+### c)
+
+Creamos tres listas de las medias de 5000 poblaciones con n= 10, 50 y 100 respectivamente.
+
+El histograma de estas tres listas tiene un resultado muy interesante.
+
+(Ejecutar esta sección puede resultar un poco lento)
+```{r}
+promedios10   = rep(0,5000) #vector de 5000 ceros
+promedios50   = rep(0,5000) 
+promedios100  = rep(0,5000) 
+
+set.seed(1234)
+for(i in 1:5000){
+    promedios10[i] = mean(sample(area, 10))
+    promedios50[i] = mean(sample(area, 50))
+    promedios100[i] = mean(sample(area, 100))
+}
+
+par(mfrow = c(3,1)) #representa las graficas en 3 filas y una columna
+xlimits = range(promedios10)
+
+hist(promedios10, breaks = 25, xlim = xlimits, xlab="n=10")
+hist(promedios50, breaks = 25, xlim = xlimits, xlab="n=50")
+hist(promedios100, breaks = 25, xlim = xlimits,xlab="n=100")
+
+par(mfrow = c(1,1))
+```
+Las medias de muestras más grandes, tienden a estar más cerca de la media poblacional.
+
+Mientras más grande sea el n de estas muestras, menos varianza tendrá el histograma, esto es el teorema del límite central.
+
+
+## Problema 2
+
+### a)
+
+```{r}
+precio = ventacasas$Precio
+
+media_pob = mean(precio)
+sd_pob    = sd(precio)
+hist(precio)
+abline(v= media_pob, col='red', lwd = 2)
+```
+En este caso no se parece anto a una distribución normal. Tiene una media de:
+```{r}
+cat('Media:', media_pob)
+```
+Y una desviación estándar de:
+```{r}
+cat('Desviación estándar:', sd_pob)
+```
+
+Ahora siguen los histogramas de las muestras n = 10, 50, 100, 1500 y 2000
+```{r}
+muestras_precio = function(n){
+    set.seed(1234)
+    muestra = sample(precio,n)
+    media_muestra = mean(muestra)
+    error = abs(media_muestra - media_pob)/media_pob  *100 #error del 13%
+    
+    hist(muestra,
+         main=n,
+         xlab="")
+    
+    abline(v= media_pob, col='green')
+    abline(v= media_muestra, col='red')
+    legend('topright',
+           legend = c("media poblacional", "media muestral"),
+           lwd = 2,
+           col=c('green', 'red')
+    )
+    
+    
+    return(c('La media de la muestra n =',n, 'dió una media muestral de',
+        media_muestra,', esta presenta un error del' ,error,'%'))
+}
+```
+```{r}
+n10 = muestras_precio(10)
+```
+```{r}
+cat(n10)
+```
+```{r}
+n50 = muestras_precio(50)
+```
+```{r}
+cat(n50)
+```
+
+```{r}
+n100 = muestras_precio(100)
+```
+```{r}
+cat(n100)
+```
+
+```{r}
+n1500 = muestras_precio(1500)
+```
+```{r}
+cat(n1500)
+```
+
+```{r}
+n2000 = muestras_precio(2000)
+```
+```{r}
+cat(n2000)
+```
+Aquí, el error de la media muestral respecto a la poblacional también se va reduciendo mientras más grande es la n de la muestra.
+Además de que el histograma se va pareciendo más al original.
+
+
+Siguen los histogramas de las tres listas con 5000 muestras de n=10, 50 y 100.
+(Ejecutar esta sección puede resultar lento)
+```{r}
+promedios10   = rep(0,5000) #vector de 5000 ceros
+promedios50   = rep(0,5000) 
+promedios100  = rep(0,5000) 
+
+set.seed(1234)
+for(i in 1:5000){
+    promedios10[i] = mean(sample(precio, 10))
+    promedios50[i] = mean(sample(precio, 50))
+    promedios100[i] = mean(sample(precio, 100))
+}
+
+par(mfrow = c(3,1)) #representa las graficas en 3 filas y una columna
+xlimits = range(promedios10)
+
+hist(promedios10, breaks = 25, xlim = xlimits, xlab="n=10")
+hist(promedios50, breaks = 25, xlim = xlimits, xlab="n=50")
+hist(promedios100, breaks = 25, xlim = xlimits,xlab="n=100")
+
+par(mfrow = c(1,1))
+```
+
+Este es el promedio de la lista con el n de las muestras más alto.
+```{r}
+mean(promedios100)
+```
+
+No está tan lejano al real, de:
+```{r}
+media_pob
+```
+
+
+### b)
+
+Este es el histograma de esos 50000 aleatorios
+```{r}
+media = mean(precio)
+standes = sd(precio)
+
+m = 50000
+n = 100
+prom = rep(0,m)  # vector para promedio muestral de cada simulacion
+
+set.seed(1234)
+
+for(i in 1:m){
+    prom[i] = mean(rnorm(n,media,standes))
+}
+hist(prom, freq=F, xlab=expression(bar(X) ))
+```
+Tendieron a tener el mismo comportamiento que la lista de las medias muestrales reales que sacamos en el punto a. Es una buena aproximación el simularlo con la normal (y también es más rápido y barato computacionalmente). Al mismo tiempo, vemos que las medias muestrales del punto a sí siguen una distribución normal respecto a la media poblacional.
+
+Y este es el gráfico de su acumulada.
+```{r}
+plot(ecdf(prom), main='', verticals=T, do.points= F, col.01line = NULL)
+abline(v= media, col='red')
+```
+
+
+
+# BLOQUE 2
+
+## Problema 5
+
+Importamos el dataset mtcars.
+```{r}
+cars <- mtcars
+
+mpg = mtcars$mpg
+```
+- Sus variables son:
+
+1. mpg	        Millas/(US) por galón
+2. cyl	        Numero de cilindros
+3. disp        Desplazamiento (pulgadas cúbicas)
+4. hp	        Caballos de fuerza
+5. drat        Relación del eje trasero (transmisión de torque)
+6. wt	        Peso (1000 lbs)
+7. qsec        Tiempo que le toma recorrer 1/4 de milla
+8. vs	        Motor (0 = tipo v, 1 = recto)
+9. am	        Transmisión (0 = automática, 1 = manual)
+10. gear        Número de engranajes
+11. carb        Número de carburadores
+
+Usaremos mpg
+
+- Sus datos se distribuyen de esta manera:
+
+```{r}
+media_mpg = mean(mpg)
+cat('Media de', media_mpg)
+```
+```{r}
+sd_mpg = sd(mpg)
+cat('Desviación estándar de', sd_mpg)
+```
+
+```{r}
+hist(mpg, breaks = 10)
+abline(v= mean(mpg), col='red', lwd=2)
+legend('topright',
+           legend = "media",
+           lwd = 2,
+           col='red'
+    )
+```
+
+- Suponiendo que los datos de mtcars son sólo una muestra (y lo son), buscaremos un intervalo de confianza del 95% para la media poblacional del mpg de todos los carros del mundo (que sería la población). 
+
+Si la confianza es 95%, alpha es 0.05
+```{r}
+alpha = 0.05
+```
+El número de datos (n) es
+```{r}
+(n = length(mpg))
+```
+
+Saquemos t(1-alpha/2, n-1)
+(n-1 son los grados de libertad, y 1-alpha/2 es la probabilidad que queremos para que nos de su percentil, de esta forma se distribuye el error en ambos lados)
+
+```{r}
+(t_alpha2 = qt(1-alpha/2, df = n-1))
+```
+
+El intervalo estará dado por la media poblacional masmenos ese T estando multiplicado por la desviación estándar sobre la raíz del número de datos.
+
+```{r}
+lim_sup = media_mpg + t_alpha2 * sd_mpg / sqrt(n)
+lim_inf = media_mpg - t_alpha2 * sd_mpg / sqrt(n)
+cat("El intervalo de confianza del 95% es [", lim_inf, ",", lim_sup, "]")
+```
+Con un 95% de seguridad, la media poblacional del mpg de los carros del mundo, está en el intervalo [ 17.91768 , 22.26357 ]
